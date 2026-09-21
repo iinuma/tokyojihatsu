@@ -32,7 +32,7 @@ import { distanceMeters } from '../../src/core/geo.js';
 import type { MasterStation, StationGroup, StationMaster } from '../../src/core/master.js';
 import { PeekDetector, pitchDegrees } from '../../src/core/pitch.js';
 import { TokyoJihatsuService, type NearbyStation } from '../../src/core/service.js';
-import { isClick } from './events.js';
+import { isClick, isDoubleClick } from './events.js';
 import { COUNTDOWN } from './layout.js';
 import {
   aboutText,
@@ -405,6 +405,14 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
     return;
   }
 
+  // ダブルタップはどの画面でも終了。審査はルートページで見るが、
+  // 画面ごとに振る舞いを変えると「ルート」の判定を取り違えたときに落ちる。
+  // システムの確認ダイアログが出るので、誤操作はそこで取り消せる。
+  if (isDoubleClick(event.textEvent?.eventType) || isDoubleClick(event.listEvent?.eventType)) {
+    await requestExit();
+    return;
+  }
+
   const list = event.listEvent;
   if (list && isClick(list.eventType)) {
     const index = list.currentSelectItemIndex ?? 0;
@@ -430,6 +438,16 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
   }
 }
 
+/**
+ * 終了を頼む。
+ *
+ * mode 1 はシステムの終了確認ダイアログ。mode 0（即終了）も、自前の確認 UI も
+ * ルートページでは審査に通らない。
+ */
+async function requestExit(): Promise<void> {
+  await bridge?.shutDownPageContainer(1);
+}
+
 async function handleMenu(itemID: number): Promise<void> {
   switch (itemID) {
     case MENU_RESELECT:
@@ -445,8 +463,7 @@ async function handleMenu(itemID: number): Promise<void> {
       await renderPage();
       break;
     case MENU_EXIT:
-      // ルートページからの終了は必ず mode 1（システムの確認ダイアログ）。
-      await bridge?.shutDownPageContainer(1);
+      await requestExit();
       break;
     default:
       break;

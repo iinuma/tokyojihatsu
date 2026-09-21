@@ -2,7 +2,7 @@ import { strict as assert } from 'node:assert';
 import { describe, it } from 'node:test';
 
 import { OsEventTypeList } from '@evenrealities/even_hub_sdk';
-import { isClick, isScrollDown, isScrollUp } from '../app/src/events.js';
+import { isClick, isDoubleClick, isScrollDown, isScrollUp } from '../app/src/events.js';
 
 describe('タップの判定', () => {
   it('CLICK_EVENT はタップ', () => {
@@ -33,5 +33,15 @@ describe('スワイプの判定', () => {
   it('undefined はスワイプではない', () => {
     assert.equal(isScrollUp(undefined), false);
     assert.equal(isScrollDown(undefined), false);
+  });
+});
+
+describe('ダブルタップの判定', () => {
+  it('DOUBLE_CLICK_EVENT だけを拾う', () => {
+    // 無反応だと審査で自動的に落とされるので、取りこぼさないことを固定する
+    assert.equal(isDoubleClick(OsEventTypeList.DOUBLE_CLICK_EVENT), true);
+    assert.equal(isDoubleClick(OsEventTypeList.CLICK_EVENT), false);
+    assert.equal(isDoubleClick(undefined), false);
+    assert.equal(isDoubleClick(OsEventTypeList.SCROLL_TOP_EVENT), false);
   });
 });
