@@ -1,0 +1,15 @@
+{
+  "package_id": "com.masahiroiinuma.tokyojihatsuprobe",
+  "edition": "202601",
+  "name": "Tokyojihatsu Probe",
+  "version": "0.1.0",
+  "min_sdk_version": "0.0.15",
+  "entrypoint": "index.html",
+  "permissions": [
+    {
+      "name": "location",
+      "desc": "Records how the phone location stream behaves while the screen is locked, to verify the design assumptions for the Tokyojihatsu departure countdown."
+    }
+  ],
+  "supported_languages": ["ja", "en"]
+}

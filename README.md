@@ -19,7 +19,8 @@ ODPT のデータ層とコアロジックが動いている。G2 のプラグイ
 | カレンダー種別の判定（祝日を含む） | 動作 |
 | 次発・次々発の算出（日跨ぎ・終電を含む） | 動作 |
 | 検証用 CLI | 動作 |
-| G2 プラグイン層（表示・入力） | 未着手 |
+| 実機検証プラグイン（probe） | 動作・実機投入待ち |
+| G2 プラグイン層（カウントダウン本体） | 未着手 |
 | API キー秘匿・ライセンス遵守のプロキシ | 未着手 |
 
 ## 対応範囲
@@ -73,6 +74,7 @@ src/
 │  ├─ master.ts     駅マスタの型・駅グループ化
 │  └─ service.ts    駅選択から次発取得までの実行時ロジック
 └─ cli/next.ts    検証用 CLI
+probe/           実機検証プラグイン（本体とは別アプリ）→ probe/README.md
 scripts/build-master.ts  駅マスタ生成
 data/stations.json       生成物（約 500KB）
 ```
@@ -114,16 +116,34 @@ ID 指定で 1 レコードずつ引く。データ更新のたびにアプリ�
 API キーは `.ehpk` に入れてはいけない（「anyone with the released .ehpk can extract bundled
 contents」）。個人利用なら ODPT を直接叩けるが、Even Hub 公開時はプロキシが必須。
 
-## 次にやること
+## 実機検証（probe）
 
-G2 プラグイン層。実機でしか決まらないことが 3 つあり、これが設計の前提になる。
+実機でしか決まらないことを測るための最小プラグインが [probe/](probe/) にある。
+手順と読み方は [probe/README.md](probe/README.md)。
 
-1. **iPhone をロックして 5 分置いた後の復帰。** JS state と位置情報がどうなるか。
-   ドキュメントが矛盾している（Background & Lifecycle は「WebView keeps running」、
-   FAQ は「WebView is suspended on background」）。localStorage へ退避して cold start から
-   復帰できる設計は Even のベータ審査項目でもあるので、どちらであっても必要。
-2. **プラグインが前面のときに見上げると何が起きるか。** HeadUp Display は Dashboard 専用で
-   自作アプリからは使えないと確定済み。「起動したら出しっぱなし」が成立するかの分かれ目。
-3. **G2 のメニューから起動するまで何操作か。**
+```bash
+npm run probe:dev      # ブラウザ / QR サイドロード用の dev サーバー
+npm run probe:qr       # 実機に読ませる QR（LAN IP 自動）
+npm run probe:pack     # dist/tokyojihatsu-probe.ehpk を作る
+```
 
-これらを確認する最小プラグイン（ロック前後の状態をログに出すだけのもの）を先に作るのが最短。
+**ロック 5 分の検証は Beta build でしかできない。** シミュレータと QR サイドロードは
+ロックした瞬間に WebView が止まり、Private build も「survive briefly but don't pass the
+5-minute lock test」と明記されている。この 1 点で設計（案1「出しっぱなし」か
+案2「IMU で自前の見上げ検出」か）が決まるので、先に潰す。
+
+調査中に分かった、要件に書かれていなかったこと:
+
+- **SDK は `setInterval` を差し替える**（`[ShadowTimers] ... queued`）。公式ドキュメントに
+  記載がない。「タイマーが飛んだ」だけでは WebView が止まったのか SDK が溜めていたのか
+  区別できないので、probe は SDK 読み込み前の素のタイマーも保持して両方を測る。
+- **`FOREGROUND_ENTER_EVENT` / `FOREGROUND_EXIT_EVENT` が SDK の enum にある。**
+  ドキュメントのイベント表には載っていない。前面・背面の遷移を取れる可能性がある。
+- **ホスト側の保存領域が使える**（`bridge.setLocalStorage` / `getLocalStorage`）。
+  WebView の localStorage とは別なので、probe は両方に書いてどちらが生き残るかも見る。
+- **実機のコンソールはスマホアプリの開発者モード画面から読める。**
+
+## そのあと
+
+カウントダウン本体の G2 プラグイン層。probe の結果が出れば、残りは
+`src/core` を「絶対座標のテキストコンテナ 3 つ＋ List コンテナ 1 つ」に流し込むだけになる。

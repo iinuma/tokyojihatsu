@@ -8,11 +8,19 @@
     "build:master": "tsx scripts/build-master.ts",
     "next": "tsx src/cli/next.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test test/*.test.ts"
+    "test": "node --import tsx --test test/*.test.ts",
+    "probe:dev": "vite --config probe/vite.config.ts",
+    "probe:build": "vite build --config probe/vite.config.ts",
+    "probe:pack": "npm run probe:build && evenhub pack probe/app.json dist/probe -o dist/tokyojihatsu-probe.ehpk --sdk-ver 0.0.15",
+    "probe:qr": "evenhub qr --url \"http://$(ipconfig getifaddr en0):5173\""
   },
   "devDependencies": {
+    "@evenrealities/even_hub_sdk": "^0.0.15",
+    "@evenrealities/evenhub-cli": "^0.1.14",
+    "@evenrealities/evenhub-simulator": "^0.9.5",
     "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vite": "^6.4.3"
   }
 }
