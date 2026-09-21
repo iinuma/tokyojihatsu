@@ -56,7 +56,7 @@ SDK は読み込み時に `setInterval` を差し替える（コンソールに 
 ### 1. Local Testing（#4〜#7 用）
 
 ```bash
-LAN_IP=$(ipconfig getifaddr en0) npm run probe:dev
+npm run probe:dev
 ```
 
 別のターミナルで QR を出し、アプリの Scan QR で読む。
@@ -65,8 +65,15 @@ LAN_IP=$(ipconfig getifaddr en0) npm run probe:dev
 npm run probe:qr
 ```
 
+LAN IP はデフォルト経路のインターフェースから取る（[scripts/lan-ip.sh](../scripts/lan-ip.sh)）。
+Wi-Fi が `en0` とは限らない——Thunderbolt ブリッジなどがあると `ipconfig getifaddr en0` は
+空を返すので、インターフェース名は決め打ちにしていない。
+
 QR が読めても画面が出ないときは、Mac のファイアウォールで node の受信を許可する／
 Wi-Fi の AP アイソレーションを疑う（テザリングに切り替えると切り分けられる）。
+
+なお probe は HMR を当てにしない。コードを書き換えてリロードが走ると計測がリセットされる
+ので、計測中はむしろ繋がっていないほうがよい。
 
 ### 2. Beta build（#1〜#3 用）
 
