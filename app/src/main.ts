@@ -89,8 +89,15 @@ let lastRemainingText = '';
 let lastError = '';
 
 const peek = new PeekDetector();
-/** 見上げたときだけ本文を出す。実機で体験を確かめたうえで既定を on にしている。 */
-let peekEnabled = true;
+/**
+ * 見上げたときだけカウントダウンを出すか。**既定は off（常時表示）。**
+ *
+ * 実機で既定 on にしたところ、装着して正面を向いている間はずっと消えたままで、
+ * 起動しても「一瞬出て消える」ようにしか見えなかった。正面は見上げの閾値を
+ * 下回るので当然ではあるが、既定の挙動としては事故に近い。
+ * 見上げ表示そのものは体験として成立しているので、選べるものとして残す。
+ */
+let peekEnabled = false;
 
 async function connectBridge(): Promise<{ bridge: EvenAppBridge | null; hostConnected: boolean }> {
   const candidate = await Promise.race([

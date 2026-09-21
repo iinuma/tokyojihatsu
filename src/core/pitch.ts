@@ -31,16 +31,25 @@ export interface PeekDetectorOptions {
   enterDegrees?: number;
   /** ここを下回ったら「下げた」。enter より小さくすること。度。 */
   exitDegrees?: number;
+  /**
+   * 最初から見えている扱いにするか。既定は true。
+   *
+   * false にすると、IMU の最初のサンプルが届くまで何も表示されない。
+   * IMU が有効になっていない端末や、起動直後に正面を向いている場合に
+   * 「何も出ない」状態になるので、見えている側から始めて下を向いたら消す。
+   */
+  initiallyUp?: boolean;
 }
 
 export class PeekDetector {
   private readonly enter: number;
   private readonly exit: number;
-  private up = false;
+  private up: boolean;
 
   constructor(options: PeekDetectorOptions = {}) {
     this.enter = options.enterDegrees ?? 20;
     this.exit = options.exitDegrees ?? 12;
+    this.up = options.initiallyUp ?? true;
   }
 
   /** 戻り値は状態が変わったかどうか。 */

@@ -70,7 +70,8 @@ let lastEvent = 'started';
 
 let location: { lat: number; lng: number; accuracy?: number } | null = null;
 let imu: { x: number; y: number; z: number } | null = null;
-const peek = new PeekDetector();
+// probe は見上げ検出そのものを試すので、伏せた状態から始める。
+const peek = new PeekDetector({ initiallyUp: false });
 /** 見上げたときだけ本文を出すデモ。案 2 が体験として成立するかを実機で試すため。 */
 let peekDemo = false;
 let device: { battery?: number; wearing?: boolean } | null = null;
