@@ -32,6 +32,7 @@ import { distanceMeters } from '../../src/core/geo.js';
 import type { MasterStation, StationGroup, StationMaster } from '../../src/core/master.js';
 import { PeekDetector, pitchDegrees } from '../../src/core/pitch.js';
 import { TokyoJihatsuService, type NearbyStation } from '../../src/core/service.js';
+import { isClick } from './events.js';
 import { COUNTDOWN } from './layout.js';
 import {
   aboutText,
@@ -338,7 +339,7 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
   }
 
   const list = event.listEvent;
-  if (list && list.eventType === OsEventTypeList.CLICK_EVENT) {
+  if (list && isClick(list.eventType)) {
     const index = list.currentSelectItemIndex ?? 0;
     if (screen === 'stations') {
       const picked = nearby[index];
@@ -351,7 +352,7 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
   }
 
   const text = event.textEvent;
-  if (text && (text.eventType === OsEventTypeList.CLICK_EVENT || text.eventType === undefined)) {
+  if (text && isClick(text.eventType)) {
     if (screen === 'about') {
       screen = selection ? 'countdown' : 'stations';
       await renderPage();
