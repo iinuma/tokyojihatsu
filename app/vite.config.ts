@@ -21,6 +21,9 @@ export default defineConfig({
   },
   server: {
     port: 5175,
+    // ポートが埋まっていたら黙ってずらさない。QR が別のサーバーを
+    // 指してしまう事故が起きるため（実際に別プロジェクトを読み込んだ）。
+    strictPort: true,
     host: true,
     hmr: lanIp ? { host: lanIp } : undefined,
   },
