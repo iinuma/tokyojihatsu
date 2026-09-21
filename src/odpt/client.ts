@@ -31,7 +31,9 @@ export class OdptClient {
   constructor(options: OdptClientOptions) {
     this.consumerKey = options.consumerKey;
     this.baseUrl = (options.baseUrl ?? DEFAULT_BASE).replace(/\/$/, '');
-    this.fetchImpl = options.fetchImpl ?? fetch;
+    // fetch をそのまま代入すると this が外れる。Node では動くが、ブラウザでは
+    // "Can only call Window.fetch on instances of Window" で落ちる（実機で遭遇）。
+    this.fetchImpl = options.fetchImpl ?? ((input, init) => globalThis.fetch(input, init));
   }
 
   private async get<T>(dataType: string, params: Record<string, string> = {}): Promise<T[]> {

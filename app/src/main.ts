@@ -26,7 +26,7 @@ import {
 } from '@evenrealities/even_hub_sdk';
 
 import masterData from '../../data/stations.json' with { type: 'json' };
-import { OdptClient } from '../../src/odpt/client.js';
+import { OdptClient, OdptError } from '../../src/odpt/client.js';
 import type { Departure } from '../../src/core/departures.js';
 import { distanceMeters } from '../../src/core/geo.js';
 import type { MasterStation, StationGroup, StationMaster } from '../../src/core/master.js';
@@ -85,6 +85,8 @@ let directionOptions: DirectionOption[] = [];
 let selection: { station: MasterStation; direction: DirectionOption['direction'] } | null = null;
 let departures: Departure[] = [];
 let lastRemainingText = '';
+/** 直近の失敗理由。原因を実機で切り分けるため画面に出す。 */
+let lastError = '';
 
 const peek = new PeekDetector();
 /** 見上げたときだけ本文を出す。実機で体験を確かめたうえで既定を on にしている。 */
@@ -107,6 +109,26 @@ async function connectBridge(): Promise<{ bridge: EvenAppBridge | null; hostConn
     new Promise<boolean>((resolve) => setTimeout(() => resolve(false), BRIDGE_TIMEOUT_MS)),
   ]);
   return { bridge: candidate, hostConnected };
+}
+
+/**
+ * 失敗の理由を短く言い表す。
+ *
+ * ネットワークが Even アプリ側で止められている場合と、API がエラーを返した場合とで
+ * 打ち手がまったく違うので、実機の画面から区別できるようにしておく。
+ */
+function describeError(error: unknown): string {
+  if (error instanceof OdptError) {
+    return `ODPT が ${error.status} を返しました`;
+  }
+  if (error instanceof TypeError) {
+    // WKWebView は "Load failed"、Chromium は "Failed to fetch"
+    return `通信がブロックされました\n(${error.message})`;
+  }
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}`.slice(0, 120);
+  }
+  return String(error).slice(0, 120);
 }
 
 function hasFlutterHost(): boolean {
@@ -277,7 +299,16 @@ async function showCountdown(
     departures = snapshot.departures;
   } catch (error) {
     console.warn('countdown failed', error);
-    await showNotice('時刻表を取得できませんでした。\n通信を確認してからもう一度。');
+    lastError = describeError(error);
+    await showNotice(
+      [
+        '時刻表を取得できませんでした。',
+        '',
+        lastError,
+        '',
+        'タップで駅選択に戻る',
+      ].join('\n'),
+    );
     return;
   }
 
@@ -356,6 +387,9 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
     if (screen === 'about') {
       screen = selection ? 'countdown' : 'stations';
       await renderPage();
+    } else if (screen === 'notice' && lastError) {
+      lastError = '';
+      await showStations();
     }
   }
 }
