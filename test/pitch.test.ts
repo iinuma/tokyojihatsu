@@ -50,9 +50,19 @@ describe('見上げ判定', () => {
     assert.equal(changes, 1); // 最初に上がったきり
   });
 
-  it('見下ろしも見上げとして扱う（符号の向きが未確定なため絶対値で判定）', () => {
+  it('うつむきには反応しない（見上げると + になると実機で確認済み）', () => {
     const detector = new PeekDetector({ enterDegrees: 20, exitDegrees: 12 });
-    assert.equal(detector.update(-25), true);
+    assert.equal(detector.update(-25), false);
+    assert.equal(detector.isUp, false);
+    assert.equal(detector.update(-60), false);
+    assert.equal(detector.isUp, false);
+  });
+
+  it('見上げた状態からうつむきに転じたら解除する', () => {
+    const detector = new PeekDetector({ enterDegrees: 20, exitDegrees: 12 });
+    detector.update(30);
     assert.equal(detector.isUp, true);
+    assert.equal(detector.update(-30), true);
+    assert.equal(detector.isUp, false);
   });
 });

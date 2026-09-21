@@ -8,7 +8,7 @@
  *   単一軸が重力だけで動ける最大は 2.0（-1G〜+1G）なので、その 80% が x に出ている。
  *   **x 軸が頭の前後傾きに対応する。**
  *
- * よって pitch = asin(x)。符号の向き（見上げが + か -）は実機で確かめる。
+ * よって pitch = asin(x)。**見上げると + になる**（実機で確認、2026-09-21）。
  */
 
 /** 重力ベクトルから頭の上下角を度で返す。水平が 0。 */
@@ -22,6 +22,9 @@ export function pitchDegrees(x: number): number {
  *
  * 閾値ちょうどで頭が揺れると状態がばたつくので、ヒステリシスを入れる
  * （バッテリー残量表示と同じ理屈で、これが無いと実用にならない）。
+ *
+ * うつむきは見上げに含めない。符号が確定する前は絶対値で見ていたが、
+ * それだと下を向いたときにも反応してしまう。歩いて足元を見る動作は多い。
  */
 export interface PeekDetectorOptions {
   /** ここを超えたら「見上げた」。度。 */
@@ -42,12 +45,11 @@ export class PeekDetector {
 
   /** 戻り値は状態が変わったかどうか。 */
   update(pitch: number): boolean {
-    const magnitude = Math.abs(pitch);
-    if (!this.up && magnitude >= this.enter) {
+    if (!this.up && pitch >= this.enter) {
       this.up = true;
       return true;
     }
-    if (this.up && magnitude < this.exit) {
+    if (this.up && pitch < this.exit) {
       this.up = false;
       return true;
     }
