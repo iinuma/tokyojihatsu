@@ -54,7 +54,7 @@ import {
 const master = masterData as unknown as StationMaster;
 
 /** ODPT ガイドライン 3.1 で表示が要る連絡先。公開前に専用アドレスへ差し替える。 */
-const CONTACT_EMAIL = 'async.sync@gmail.com';
+const CONTACT_EMAIL = 'async.sync+tokyojihatsu@gmail.com';
 
 /** 徒歩圏に対応駅が無かったときに広げる範囲。 */
 const WIDE_SEARCH_METERS = 30_000;
