@@ -58,6 +58,12 @@ export interface ProbeState {
   lastLocationAt: number;
   locationCount: number;
   launchSource: string;
+  /**
+   * IMU 各軸の振れ幅。頭を動かしたときどの軸がどれだけ動くかを見る。
+   * 実測で |v| ≒ 1.0 だったので単位は G（重力加速度）。
+   * どの軸が頭の前後傾きに対応するかは、これを見て決める。
+   */
+  imuRange: { min: [number, number, number]; max: [number, number, number]; samples: number } | null;
   /** SDK がタイマーを差し替えていたか。 */
   timersPatched: boolean;
   /** Even アプリのホストに繋がっているか（素のブラウザでは false）。 */
@@ -82,6 +88,7 @@ export function createState(now: number): ProbeState {
     lastLocationAt: 0,
     locationCount: 0,
     launchSource: 'unknown',
+    imuRange: null,
     timersPatched: false,
     hostConnected: false,
     events: [],
@@ -235,6 +242,21 @@ export function heartbeat(
   if (elapsed > tracker.maxMs) tracker.maxMs = elapsed;
   addEvent(state, 'gap', `${which} 停止 ${formatDuration(elapsed)}`, now);
   return elapsed;
+}
+
+/** IMU サンプルを 1 つ取り込み、各軸の振れ幅を更新する。 */
+export function recordImu(state: ProbeState, x: number, y: number, z: number): void {
+  if (!state.imuRange) {
+    state.imuRange = { min: [x, y, z], max: [x, y, z], samples: 1 };
+    return;
+  }
+  const { min, max } = state.imuRange;
+  const value: [number, number, number] = [x, y, z];
+  for (let i = 0; i < 3; i += 1) {
+    if (value[i]! < min[i]!) min[i] = value[i]!;
+    if (value[i]! > max[i]!) max[i] = value[i]!;
+  }
+  state.imuRange.samples += 1;
 }
 
 export function formatDuration(ms: number): string {

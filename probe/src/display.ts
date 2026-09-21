@@ -37,8 +37,8 @@ export function renderSummary(input: DisplayInput): string {
   // 1. ロック復帰でタイマーが止まったか。
   //    sdk = SDK 差し替え後 / raw = 差し替え前。両方止まれば WebView ごと止まった、
   //    sdk だけ止まれば SDK の shadow timer がキューに溜めていた、と読める。
-  lines.push(gapLine('sdk', state.shadow));
-  lines.push(gapLine('raw', state.raw));
+  //    G2 の画面は行数が限られるので 1 行にまとめる。
+  lines.push(`stop ${gapLine(state.shadow)} | raw ${gapLine(state.raw)}`);
 
   lines.push(
     `store web:${storage.web ? 'y' : 'n'} host:${storage.host ? 'y' : 'n'}  ` +
@@ -48,28 +48,40 @@ export function renderSummary(input: DisplayInput): string {
   // 位置情報が止まるかどうか
   if (location) {
     const age = state.lastLocationAt ? formatDuration(now - state.lastLocationAt) : '-';
-    lines.push(`loc ${state.locationCount}x  ${age} ago`);
-    lines.push(`  ${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`);
+    const accuracy = location.accuracy === undefined ? '' : ` ±${Math.round(location.accuracy)}m`;
+    lines.push(
+      `loc ${state.locationCount}x ${age} ago${accuracy}  ${location.lat.toFixed(4)},${location.lng.toFixed(4)}`,
+    );
   } else {
     lines.push('loc: none');
   }
 
-  // 2. 見上げ検出に使えるか（IMU の生値）
-  lines.push(
-    imu
-      ? `imu x${fixed(imu.x)} y${fixed(imu.y)} z${fixed(imu.z)}`
-      : 'imu: off',
-  );
+  // 2. 見上げ検出に使えるか。
+  //    静止時の |v| が 1.0 前後なら単位は G（重力加速度）で、ピッチ角が計算できる。
+  //    頭を上下に振ったとき、どの軸が一番動くかを振れ幅で見る。
+  if (imu) {
+    const magnitude = Math.sqrt(imu.x ** 2 + imu.y ** 2 + imu.z ** 2);
+    lines.push(`imu ${fixed(imu.x)} ${fixed(imu.y)} ${fixed(imu.z)}  |v|${magnitude.toFixed(2)}`);
+
+    const range = state.imuRange;
+    if (range) {
+      const spread = (i: number) => (range.max[i]! - range.min[i]!).toFixed(1);
+      lines.push(`  swing x${spread(0)} y${spread(1)} z${spread(2)}  n${range.samples}`);
+    }
+  } else {
+    lines.push('imu: off');
+  }
 
   if (device) {
     const battery = device.battery === undefined ? '-' : `${device.battery}%`;
-    lines.push(`batt ${battery}  wear ${device.wearing ? 'y' : 'n'}`);
+    lines.push(`batt ${battery} wear ${device.wearing ? 'y' : 'n'}  ${input.lastEvent}`);
+  } else {
+    lines.push(`> ${input.lastEvent}`);
   }
 
   // 日本語が出るかのテスト行。空白になったら firmware のフォントに無い。
   lines.push('JP: 月島 大江戸線 光が丘方面 18:42');
 
-  lines.push(`> ${input.lastEvent}`);
   lines.push('tap:log  swipe:page  hold-tap:menu');
 
   return lines.join('\n');
@@ -100,9 +112,9 @@ export function renderLog(state: ProbeState, page: number): string {
   return lines.join('\n');
 }
 
-function gapLine(label: string, tracker: GapTracker): string {
-  if (tracker.count === 0) return `${label} stop: none`;
-  return `${label} stop: ${tracker.count}x last ${formatDuration(tracker.lastMs)} max ${formatDuration(tracker.maxMs)}`;
+function gapLine(tracker: GapTracker): string {
+  if (tracker.count === 0) return 'none';
+  return `${tracker.count}x max ${formatDuration(tracker.maxMs)}`;
 }
 
 function fixed(value: number): string {
@@ -122,6 +134,11 @@ export function renderDump(state: ProbeState): string {
     `timers patched ${state.timersPatched}  bridge ${state.hostConnected}`,
     `locations ${state.locationCount}`,
     `launch ${state.launchSource}`,
+    state.imuRange
+      ? `imu swing x${(state.imuRange.max[0]! - state.imuRange.min[0]!).toFixed(2)} ` +
+        `y${(state.imuRange.max[1]! - state.imuRange.min[1]!).toFixed(2)} ` +
+        `z${(state.imuRange.max[2]! - state.imuRange.min[2]!).toFixed(2)} (n=${state.imuRange.samples})`
+      : 'imu: no samples',
     '',
   ];
   for (const event of state.events) {

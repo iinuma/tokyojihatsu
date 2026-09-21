@@ -38,6 +38,7 @@ import {
   clear,
   heartbeat,
   persist,
+  recordImu,
   restore,
   type HostStorage,
   type ProbeState,
@@ -213,6 +214,7 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
   // IMU は件数が多いのでログに積まず、最新値だけ持つ。
   if (sys?.eventType === OsEventTypeList.IMU_DATA_REPORT && sys.imuData) {
     imu = { x: sys.imuData.x ?? 0, y: sys.imuData.y ?? 0, z: sys.imuData.z ?? 0 };
+    recordImu(state, imu.x, imu.y, imu.z);
     return;
   }
 
@@ -307,9 +309,15 @@ async function wireBridge(): Promise<void> {
   });
 
   bridge.onAppLocationChanged((fix) => {
+    const now = Date.now();
+    const sinceLast = state.lastLocationAt ? now - state.lastLocationAt : 0;
     location = { lat: fix.latitude, lng: fix.longitude, accuracy: fix.accuracy };
     state.locationCount += 1;
-    state.lastLocationAt = Date.now();
+    state.lastLocationAt = now;
+    // 間隔が開いたものだけ記録する。毎回積むとログが位置で埋まる。
+    if (sinceLast > 30_000) {
+      addEvent(state, 'location', `更新が ${Math.round(sinceLast / 1000)}s ぶり`, now);
+    }
   });
 
   // 単発で 1 回取ってから継続取得を始める。
@@ -331,18 +339,19 @@ async function wireBridge(): Promise<void> {
   }
 
   try {
+    // distanceFilter は付けない。10m 動かないと push が来ない設定だと、
+    // 「ストリームが死んでいる」のか「動いていないだけ」なのか区別できない。
     await bridge.startAppLocationUpdates({
       accuracy: AppLocationAccuracy.Medium,
       intervalMs: 5000,
-      distanceFilter: 10,
     });
   } catch (error) {
     note(`location stream error: ${String(error)}`, 'location-fail');
   }
 
-  // 見上げ検出に使えるかを見るため、粗いペースで IMU を回す。
+  // 見上げ動作を捉えるには 1 秒間隔では粗い。振れ幅を見たいので細かめに回す。
   try {
-    await bridge.imuControl(true, ImuReportPace.P1000);
+    await bridge.imuControl(true, ImuReportPace.P200);
   } catch (error) {
     note(`imu error: ${String(error)}`, 'note');
   }
