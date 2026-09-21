@@ -21,6 +21,8 @@ const here = fileURLToPath(new URL('.', import.meta.url));
 export interface ProxyStackProps extends StackProps {
   /** ODPT トークンを入れた SSM パラメータ名（SecureString）。 */
   tokenParameterName: string;
+  /** アプリとの共有鍵を入れた SSM パラメータ名（SecureString）。 */
+  appKeyParameterName: string;
 }
 
 export class TokyojihatsuProxyStack extends Stack {
@@ -43,6 +45,7 @@ export class TokyojihatsuProxyStack extends Stack {
       environment: {
         // 値ではなくパラメータ名だけを渡す。テンプレートにキーを残さないため。
         ODPT_TOKEN_PARAM: props.tokenParameterName,
+        APP_KEY_PARAM: props.appKeyParameterName,
       },
       bundling: {
         format: undefined,
@@ -58,6 +61,11 @@ export class TokyojihatsuProxyStack extends Stack {
       parameterName: props.tokenParameterName,
     });
     parameter.grantRead(fn);
+
+    const appKeyParameter = StringParameter.fromSecureStringParameterAttributes(this, 'AppKey', {
+      parameterName: props.appKeyParameterName,
+    });
+    appKeyParameter.grantRead(fn);
 
     const url = fn.addFunctionUrl({
       // 公開アプリから叩くので認証は付けない。扱えるデータ型とクエリを

@@ -54,6 +54,10 @@ export interface ProxyRequest {
   path: string;
   query: Record<string, string | undefined>;
   method: string;
+  /** 小文字化したヘッダ名 → 値。アプリからの呼び出しか確かめるのに使う。 */
+  headers?: Record<string, string | undefined>;
+  /** 呼び出し元の IP。レート制限に使う。 */
+  sourceIp?: string;
 }
 
 export interface ProxyResponse {
@@ -64,9 +68,27 @@ export interface ProxyResponse {
 
 export interface ProxyOptions {
   token: string;
+  /**
+   * アプリが送ってくる共有鍵。設定すると、一致しないリクエストを 403 で返す。
+   *
+   * ODPT のライセンスは基本・限定とも、データを「第三者が再利用可能な状態で
+   * 公開、再配布、公衆送信」することを禁じている（第 8 条 4(1)）。
+   * URL を知るだけで JSON が取れる状態は、これに当たると読める。
+   *
+   * .ehpk は展開できるので鍵は完全には隠せない。ここで目指すのは
+   * 「誰でも叩ける API として公開しない」ことであって、完全な防御ではない。
+   */
+  appKey?: string;
+  /** 1 分あたりの上限。既定 60。0 で無効。 */
+  rateLimitPerMinute?: number;
   fetchImpl?: typeof fetch;
   baseUrl?: string;
+  /** テスト用の時刻源。 */
+  now?: () => number;
 }
+
+/** アプリが共有鍵を載せるヘッダ名。 */
+export const APP_KEY_HEADER = 'x-tokyojihatsu-key';
 
 /**
  * CORS は **ここだけ**が返す。
@@ -81,7 +103,8 @@ const CORS_HEADERS: Record<string, string> = {
   // WebView の origin は固定できないので * にする。ODPT 自身も * を返す。
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  // 共有鍵をカスタムヘッダで送るため、プリフライトで許可しておく。
+  'Access-Control-Allow-Headers': `Content-Type, ${'X-Tokyojihatsu-Key'}`,
   'Access-Control-Max-Age': '86400',
 };
 
@@ -100,6 +123,36 @@ export function dataTypeFromPath(path: string): string | null {
   return last.length > 0 ? decodeURIComponent(last) : null;
 }
 
+/**
+ * 直近 1 分のリクエスト数。Lambda の実行環境ごとに持つので厳密ではないが、
+ * 単純な総当たりや連打を抑えるには足りる。正確さが要るなら DynamoDB に移す。
+ */
+const recentRequests = new Map<string, number[]>();
+
+function withinRateLimit(sourceIp: string | undefined, limit: number, now: number): boolean {
+  if (limit <= 0) return true;
+  const key = sourceIp ?? 'unknown';
+  const windowStart = now - 60_000;
+
+  const hits = (recentRequests.get(key) ?? []).filter((at) => at > windowStart);
+  hits.push(now);
+  recentRequests.set(key, hits);
+
+  // 覚えっぱなしにしないよう、古い IP を捨てる。
+  if (recentRequests.size > 1000) {
+    for (const [ip, times] of recentRequests) {
+      if (times.every((at) => at <= windowStart)) recentRequests.delete(ip);
+    }
+  }
+
+  return hits.length <= limit;
+}
+
+/** テスト用。 */
+export function resetRateLimit(): void {
+  recentRequests.clear();
+}
+
 export async function handleProxyRequest(
   request: ProxyRequest,
   options: ProxyOptions,
@@ -109,6 +162,19 @@ export async function handleProxyRequest(
   }
   if (request.method !== 'GET') {
     return json(405, { error: 'GET と OPTIONS のみ受け付けます' });
+  }
+
+  // 共有鍵の確認。ライセンス上、データを誰でも取れる状態にはできない。
+  if (options.appKey) {
+    const provided = request.headers?.[APP_KEY_HEADER];
+    if (provided !== options.appKey) {
+      return json(403, { error: 'このエンドポイントは東京次発アプリ専用です' });
+    }
+  }
+
+  const now = (options.now ?? Date.now)();
+  if (!withinRateLimit(request.sourceIp, options.rateLimitPerMinute ?? 60, now)) {
+    return json(429, { error: 'リクエストが多すぎます' }, { 'Retry-After': '60' });
   }
 
   const dataType = dataTypeFromPath(request.path);

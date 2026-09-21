@@ -148,8 +148,15 @@ function describeError(error: unknown): string {
 function createOdptClient(): OdptClient {
   const proxyUrl = import.meta.env.VITE_ODPT_PROXY;
   if (proxyUrl) {
-    // 鍵はプロキシ側が持つので、こちらは空でよい。
-    return new OdptClient({ consumerKey: '', baseUrl: proxyUrl });
+    // ODPT の鍵はプロキシ側が持つので、こちらは空でよい。
+    // 共有鍵は「誰でも叩ける API にしない」ためのもの。バンドルから取り出せるが、
+    // URL を知っただけでは使えない状態にはなる（ライセンス第 8 条 4(1)）。
+    const appKey = import.meta.env.VITE_PROXY_APP_KEY;
+    return new OdptClient({
+      consumerKey: '',
+      baseUrl: proxyUrl,
+      headers: appKey ? { 'X-Tokyojihatsu-Key': appKey } : {},
+    });
   }
 
   const token = import.meta.env.VITE_ODPT_TOKEN;

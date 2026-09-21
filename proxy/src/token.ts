@@ -10,19 +10,20 @@
 
 import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 
-let cached: string | null = null;
+const cache = new Map<string, string>();
 let client: SSMClient | null = null;
 
-export async function resolveToken(): Promise<string> {
-  if (cached) return cached;
+async function resolve(envName: string, paramEnvName: string): Promise<string> {
+  const hit = cache.get(envName);
+  if (hit) return hit;
 
-  const direct = process.env.ODPT_TOKEN;
+  const direct = process.env[envName];
   if (direct) {
-    cached = direct;
+    cache.set(envName, direct);
     return direct;
   }
 
-  const parameterName = process.env.ODPT_TOKEN_PARAM;
+  const parameterName = process.env[paramEnvName];
   if (!parameterName) return '';
 
   client ??= new SSMClient({});
@@ -31,11 +32,24 @@ export async function resolveToken(): Promise<string> {
   );
 
   const value = result.Parameter?.Value ?? '';
-  if (value) cached = value;
+  if (value) cache.set(envName, value);
   return value;
+}
+
+/** ODPT の consumerKey。 */
+export function resolveToken(): Promise<string> {
+  return resolve('ODPT_TOKEN', 'ODPT_TOKEN_PARAM');
+}
+
+/**
+ * アプリとの共有鍵。未設定なら空を返し、そのときは鍵の検査をしない
+ * （ローカル開発のため）。
+ */
+export function resolveAppKey(): Promise<string> {
+  return resolve('APP_KEY', 'APP_KEY_PARAM');
 }
 
 /** テスト用。 */
 export function resetTokenCache(): void {
-  cached = null;
+  cache.clear();
 }

@@ -71,6 +71,27 @@
          ]
         ]
        }
+      },
+      {
+       "Action": [
+        "ssm:DescribeParameters",
+        "ssm:GetParameters",
+        "ssm:GetParameter",
+        "ssm:GetParameterHistory"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:",
+          {
+           "Ref": "AWS::Partition"
+          },
+          ":ssm:ap-northeast-1:473259746493:parameter/tokyojihatsu/app-key"
+         ]
+        ]
+       }
       }
      ],
      "Version": "2012-10-17"
@@ -91,11 +112,12 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-473259746493-ap-northeast-1",
-     "S3Key": "31683b2092dd0200c332f53c37ebdc64df2564baa94d84582e8625b3f4fd03a7.zip"
+     "S3Key": "8afa4954892df8aa42d6465d975cb8897d89da40f5209bf9ba6f28bc9ee532fc.zip"
     },
     "Environment": {
      "Variables": {
-      "ODPT_TOKEN_PARAM": "/tokyojihatsu/odpt-token"
+      "ODPT_TOKEN_PARAM": "/tokyojihatsu/odpt-token",
+      "APP_KEY_PARAM": "/tokyojihatsu/app-key"
      }
     },
     "Handler": "index.handler",
@@ -120,7 +142,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "TokyojihatsuProxyStack/OdptProxy/Resource",
-    "aws:asset:path": "asset.31683b2092dd0200c332f53c37ebdc64df2564baa94d84582e8625b3f4fd03a7",
+    "aws:asset:path": "asset.8afa4954892df8aa42d6465d975cb8897d89da40f5209bf9ba6f28bc9ee532fc",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }

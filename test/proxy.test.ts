@@ -1,7 +1,12 @@
 import { strict as assert } from 'node:assert';
-import { describe, it } from 'node:test';
+import { beforeEach, describe, it } from 'node:test';
 
-import { dataTypeFromPath, handleProxyRequest } from '../proxy/src/proxy.js';
+import {
+  APP_KEY_HEADER,
+  dataTypeFromPath,
+  handleProxyRequest,
+  resetRateLimit,
+} from '../proxy/src/proxy.js';
 
 /** 上流の ODPT を差し替えて、何を投げたかを記録する。 */
 function upstream(body: unknown = [], status = 200) {
@@ -19,6 +24,11 @@ function upstream(body: unknown = [], status = 200) {
 }
 
 const TOKEN = 'server-side-secret';
+const APP_KEY = 'app-shared-key';
+
+beforeEach(() => {
+  resetRateLimit();
+});
 
 describe('中継するデータ型', () => {
   it('許可したデータ型は通す', async () => {
@@ -172,5 +182,134 @@ describe('上流が失敗したとき', () => {
       { token: TOKEN, fetchImpl },
     );
     assert.equal(response.status, 502);
+  });
+});
+
+describe('アプリ以外からの利用を防ぐ', () => {
+  it('共有鍵が一致すれば通す', async () => {
+    const { calls, fetchImpl } = upstream();
+    const response = await handleProxyRequest(
+      {
+        path: '/odpt:Station',
+        query: {},
+        method: 'GET',
+        headers: { [APP_KEY_HEADER]: APP_KEY },
+      },
+      { token: TOKEN, appKey: APP_KEY, fetchImpl },
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(calls.length, 1);
+  });
+
+  it('鍵がなければ 403 にして上流に投げない', async () => {
+    // ライセンスは「第三者が再利用可能な状態での公衆送信」を禁じている。
+    // URL を知っただけで JSON が取れる状態にはしない。
+    const { calls, fetchImpl } = upstream();
+    const response = await handleProxyRequest(
+      { path: '/odpt:Station', query: {}, method: 'GET' },
+      { token: TOKEN, appKey: APP_KEY, fetchImpl },
+    );
+
+    assert.equal(response.status, 403);
+    assert.equal(calls.length, 0);
+  });
+
+  it('鍵が違えば 403', async () => {
+    const { fetchImpl } = upstream();
+    const response = await handleProxyRequest(
+      {
+        path: '/odpt:Station',
+        query: {},
+        method: 'GET',
+        headers: { [APP_KEY_HEADER]: 'wrong' },
+      },
+      { token: TOKEN, appKey: APP_KEY, fetchImpl },
+    );
+    assert.equal(response.status, 403);
+  });
+
+  it('鍵を設定していなければ検査しない（ローカル開発用）', async () => {
+    const { fetchImpl } = upstream();
+    const response = await handleProxyRequest(
+      { path: '/odpt:Station', query: {}, method: 'GET' },
+      { token: TOKEN, fetchImpl },
+    );
+    assert.equal(response.status, 200);
+  });
+
+  it('プリフライトは鍵なしでも通す（ブラウザが先に投げるため）', async () => {
+    const { fetchImpl } = upstream();
+    const response = await handleProxyRequest(
+      { path: '/odpt:Station', query: {}, method: 'OPTIONS' },
+      { token: TOKEN, appKey: APP_KEY, fetchImpl },
+    );
+    assert.equal(response.status, 204);
+  });
+
+  it('プリフライトで共有鍵ヘッダを許可する', async () => {
+    const { fetchImpl } = upstream();
+    const response = await handleProxyRequest(
+      { path: '/odpt:Station', query: {}, method: 'OPTIONS' },
+      { token: TOKEN, fetchImpl },
+    );
+    assert.match(response.headers['Access-Control-Allow-Headers'] ?? '', /X-Tokyojihatsu-Key/);
+  });
+});
+
+describe('レート制限', () => {
+  const base = 1_000_000;
+
+  it('上限までは通し、超えたら 429', async () => {
+    const { fetchImpl } = upstream();
+    const call = (n: number) =>
+      handleProxyRequest(
+        { path: '/odpt:Station', query: {}, method: 'GET', sourceIp: '203.0.113.1' },
+        { token: TOKEN, fetchImpl, rateLimitPerMinute: 3, now: () => base + n },
+      );
+
+    assert.equal((await call(0)).status, 200);
+    assert.equal((await call(1)).status, 200);
+    assert.equal((await call(2)).status, 200);
+    const over = await call(3);
+    assert.equal(over.status, 429);
+    assert.equal(over.headers['Retry-After'], '60');
+  });
+
+  it('1 分経てば枠が戻る', async () => {
+    const { fetchImpl } = upstream();
+    const call = (at: number) =>
+      handleProxyRequest(
+        { path: '/odpt:Station', query: {}, method: 'GET', sourceIp: '203.0.113.2' },
+        { token: TOKEN, fetchImpl, rateLimitPerMinute: 1, now: () => at },
+      );
+
+    assert.equal((await call(base)).status, 200);
+    assert.equal((await call(base + 1)).status, 429);
+    assert.equal((await call(base + 61_000)).status, 200);
+  });
+
+  it('IP ごとに数える', async () => {
+    const { fetchImpl } = upstream();
+    const call = (ip: string) =>
+      handleProxyRequest(
+        { path: '/odpt:Station', query: {}, method: 'GET', sourceIp: ip },
+        { token: TOKEN, fetchImpl, rateLimitPerMinute: 1, now: () => base },
+      );
+
+    assert.equal((await call('203.0.113.3')).status, 200);
+    assert.equal((await call('203.0.113.4')).status, 200);
+    assert.equal((await call('203.0.113.3')).status, 429);
+  });
+
+  it('0 を指定すると無効になる', async () => {
+    const { fetchImpl } = upstream();
+    for (let i = 0; i < 5; i += 1) {
+      const r = await handleProxyRequest(
+        { path: '/odpt:Station', query: {}, method: 'GET', sourceIp: '203.0.113.5' },
+        { token: TOKEN, fetchImpl, rateLimitPerMinute: 0, now: () => base },
+      );
+      assert.equal(r.status, 200);
+    }
   });
 });

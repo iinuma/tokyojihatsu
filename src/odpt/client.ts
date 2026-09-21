@@ -16,6 +16,11 @@ export interface OdptClientOptions {
    */
   baseUrl?: string;
   fetchImpl?: typeof fetch;
+  /**
+   * すべてのリクエストに付けるヘッダ。
+   * プロキシ経由のとき、アプリからの呼び出しであることを示す共有鍵を載せる。
+   */
+  headers?: Record<string, string>;
 }
 
 /**
@@ -27,6 +32,7 @@ export class OdptClient {
   private readonly baseUrl: string;
   private readonly consumerKey: string;
   private readonly fetchImpl: typeof fetch;
+  private readonly headers: Record<string, string>;
 
   constructor(options: OdptClientOptions) {
     this.consumerKey = options.consumerKey;
@@ -34,6 +40,7 @@ export class OdptClient {
     // fetch をそのまま代入すると this が外れる。Node では動くが、ブラウザでは
     // "Can only call Window.fetch on instances of Window" で落ちる（実機で遭遇）。
     this.fetchImpl = options.fetchImpl ?? ((input, init) => globalThis.fetch(input, init));
+    this.headers = options.headers ?? {};
   }
 
   private async get<T>(dataType: string, params: Record<string, string> = {}): Promise<T[]> {
@@ -43,7 +50,9 @@ export class OdptClient {
       query['acl:consumerKey'] = this.consumerKey;
     }
 
-    const response = await this.fetchImpl(this.buildUrl(dataType, query));
+    const init: RequestInit | undefined =
+      Object.keys(this.headers).length > 0 ? { headers: this.headers } : undefined;
+    const response = await this.fetchImpl(this.buildUrl(dataType, query), init);
     if (!response.ok) {
       throw new OdptError(
         `ODPT ${dataType} が ${response.status} ${response.statusText} を返した`,
