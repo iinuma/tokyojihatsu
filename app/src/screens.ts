@@ -163,10 +163,10 @@ export function countdownTexts(
   if (second) upcomingLines.push(`次々発 ${second.displayTime}${second.isLast ? ' 終' : ''}`);
   if (upcomingLines.length === 0) upcomingLines.push('終電後');
 
-  const footer = [
-    `${station.name}　${station.railwayName}・${direction.label}`,
-    '時刻表ベース',
-  ].join('\n');
+  // 「時刻表ベース」の注記はここには置かない。ライセンス上の必須表示ではなく
+  // （必須の 3 点と取得日時は「データについて」にある）、毎秒見る画面に
+  // 常駐させる価値がない。遅延を反映しない旨はそちらに書いてある。
+  const footer = `${station.name}　${station.railwayName}・${direction.label}`;
 
   return { remaining, upcoming: upcomingLines.join('\n'), footer };
 }
@@ -202,6 +202,7 @@ export function aboutText(sourceDate: string, contactEmail: string): string {
     'このアプリの時刻表データは',
     '公共交通オープンデータセンターの提供です。',
     'データの正確性・完全性は保証されていません。',
+    '表示は時刻表上の予定時刻で、遅延は反映されません。',
     `データ取得日時: ${sourceDate || '不明'}`,
     `連絡先: ${contactEmail}`,
     '',

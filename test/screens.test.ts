@@ -99,7 +99,8 @@ describe('カウントダウン画面', () => {
     const texts = countdownTexts(station, direction, [departure('20:23', 4), departure('20:30', 11)], now);
     assert.match(texts.remaining, /あと 3:5\d|あと 4:00/);
     assert.equal(texts.upcoming, '次発 20:23\n次々発 20:30');
-    assert.equal(texts.footer, '月島　大江戸線・光が丘方面\n時刻表ベース');
+    // フッターは駅名と方面だけ。注記は「データについて」に移した
+    assert.equal(texts.footer, '月島　大江戸線・光が丘方面');
   });
 
   it('終電には印を付ける', () => {
@@ -124,6 +125,8 @@ describe('データについての画面', () => {
     const text = aboutText('2026-05-28T15:00:00+09:00', 'dev@example.com');
     assert.match(text, /公共交通オープンデータセンター/);
     assert.match(text, /保証されていません/);
+    // 遅延を反映しない旨はカウントダウン画面から外してこちらに置いた
+    assert.match(text, /遅延は反映されません/);
     assert.match(text, /dev@example.com/);
     assert.match(text, /2026-05-28/);
   });

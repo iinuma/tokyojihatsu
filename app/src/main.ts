@@ -247,6 +247,14 @@ async function updateRemaining(): Promise<void> {
       content: hidden ? ' ' : texts.upcoming,
     }),
   );
+  // 駅名も伏せる。ここが残っていると、伏せているつもりでも視界に文字が残る。
+  await bridge.textContainerUpgrade(
+    new TextContainerUpgrade({
+      containerID: COUNTDOWN.footer.id,
+      containerName: COUNTDOWN.footer.name,
+      content: hidden ? ' ' : texts.footer,
+    }),
+  );
 }
 
 /** ブラウザでも同じ内容を読めるようにしておく（実機なしで確認するため）。 */
