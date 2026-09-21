@@ -37,16 +37,13 @@ export class OdptClient {
   }
 
   private async get<T>(dataType: string, params: Record<string, string> = {}): Promise<T[]> {
-    const url = new URL(`${this.baseUrl}/${dataType}`);
-    for (const [key, value] of Object.entries(params)) {
-      url.searchParams.set(key, value);
-    }
+    const query: Record<string, string> = { ...params };
     // プロキシ経由のときは鍵を持たない（サーバー側が付ける）。
     if (this.consumerKey) {
-      url.searchParams.set('acl:consumerKey', this.consumerKey);
+      query['acl:consumerKey'] = this.consumerKey;
     }
 
-    const response = await this.fetchImpl(url.toString());
+    const response = await this.fetchImpl(this.buildUrl(dataType, query));
     if (!response.ok) {
       throw new OdptError(
         `ODPT ${dataType} が ${response.status} ${response.statusText} を返した`,
@@ -55,6 +52,22 @@ export class OdptClient {
       );
     }
     return (await response.json()) as T[];
+  }
+
+  /**
+   * クエリを組み立てる。
+   *
+   * ODPT のクエリ名はコロンを含む（`odpt:operator`）。`URLSearchParams` は
+   * コロンをそのまま残すが、**Lambda Function URL は生のコロンを含むクエリ名を
+   * InvalidQueryStringException で弾く**（実測）。パスのコロンは通る。
+   * ODPT 側はエンコードしてもしなくても同じ結果を返すので、常にエンコードする。
+   */
+  private buildUrl(dataType: string, query: Record<string, string>): string {
+    const search = Object.entries(query)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+    const base = `${this.baseUrl}/${dataType}`;
+    return search ? `${base}?${search}` : base;
   }
 
   stations(operator: string): Promise<OdptStation[]> {

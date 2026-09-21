@@ -97,3 +97,30 @@ describe('プロキシ経由', () => {
     assert.equal(url.searchParams.get('odpt:operator'), 'odpt.Operator:Toei');
   });
 });
+
+describe('クエリのエンコード', () => {
+  it('コロンを含むクエリ名をパーセントエンコードする', async () => {
+    // Lambda Function URL は生のコロンを含むクエリ名を
+    // InvalidQueryStringException で弾く（実測）。ODPT 側はどちらでも同じ結果。
+    const calls = spyFetch();
+    await new OdptClient({ consumerKey: 'k' }).stations('odpt.Operator:Toei');
+
+    assert.ok(calls[0]!.url.includes('odpt%3Aoperator='), calls[0]!.url);
+    assert.ok(calls[0]!.url.includes('acl%3AconsumerKey='), calls[0]!.url);
+    assert.ok(!/\?[^#]*odpt:operator=/.test(calls[0]!.url), '生のコロンが残っている');
+  });
+
+  it('パスのデータ型はエンコードしない（Function URL も ODPT も通る）', async () => {
+    const calls = spyFetch();
+    await new OdptClient({ consumerKey: 'k' }).stations('odpt.Operator:Toei');
+    assert.ok(calls[0]!.url.includes('/odpt:Station?'), calls[0]!.url);
+  });
+
+  it('エンコードしても値は正しく読み取れる', async () => {
+    const calls = spyFetch();
+    await new OdptClient({ consumerKey: 'k' }).stations('odpt.Operator:Toei');
+
+    const url = new URL(calls[0]!.url);
+    assert.equal(url.searchParams.get('odpt:operator'), 'odpt.Operator:Toei');
+  });
+});

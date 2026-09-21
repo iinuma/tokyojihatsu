@@ -12,9 +12,14 @@
     },
     {
       "name": "network",
-      "desc": "公共交通オープンデータセンター（ODPT）から駅の時刻表を取得するために使います。",
-      "whitelist": ["https://api.odpt.org"]
+      "desc": "駅の時刻表を取得するために、公共交通オープンデータセンター（ODPT）の中継サーバーへ接続します。",
+      "whitelist": [
+        "https://7i3fsrat6n32v4fadbful24jsm0yrbyu.lambda-url.ap-northeast-1.on.aws"
+      ]
     }
   ],
-  "supported_languages": ["ja", "en"]
+  "supported_languages": [
+    "ja",
+    "en"
+  ]
 }
