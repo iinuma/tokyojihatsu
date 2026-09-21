@@ -9,7 +9,7 @@
 import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from 'aws-cdk-lib';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-import { FunctionUrlAuthType, HttpMethod } from 'aws-cdk-lib/aws-lambda';
+import { FunctionUrlAuthType } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import type { Construct } from 'constructs';
@@ -63,12 +63,11 @@ export class TokyojihatsuProxyStack extends Stack {
       // 公開アプリから叩くので認証は付けない。扱えるデータ型とクエリを
       // proxy.ts 側で絞ってあり、キーは外に出ない。
       authType: FunctionUrlAuthType.NONE,
-      cors: {
-        allowedOrigins: ['*'],
-        allowedMethods: [HttpMethod.GET],
-        allowedHeaders: ['Content-Type'],
-        maxAge: Duration.days(1),
-      },
+      // CORS は Function URL 側では設定しない。
+      // ここで設定すると AWS が付けるヘッダとハンドラが返すヘッダが重なり、
+      // Access-Control-Allow-Origin が 2 つ返る。ブラウザは複数あると
+      // 仕様上エラーにするので、WebView からの fetch が Load failed で落ちる（実機で遭遇）。
+      // 応答の組み立てはハンドラ側に一本化する（テストもそちらにある）。
     });
 
     new CfnOutput(this, 'ProxyUrl', {

@@ -68,6 +68,15 @@ export interface ProxyOptions {
   baseUrl?: string;
 }
 
+/**
+ * CORS は **ここだけ**が返す。
+ *
+ * Lambda Function URL 側にも CORS 設定があるが、両方で設定すると
+ * `Access-Control-Allow-Origin` が 2 つ返る（一方は `*`、もう一方は Origin の
+ * エコー）。ブラウザはこのヘッダが複数あると仕様上エラーにするので、
+ * WebView からの fetch が "Load failed" で落ちる。実機で遭遇したので
+ * インフラ側（proxy/infra/stack.ts）の cors は外してある。
+ */
 const CORS_HEADERS: Record<string, string> = {
   // WebView の origin は固定できないので * にする。ODPT 自身も * を返す。
   'Access-Control-Allow-Origin': '*',

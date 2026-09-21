@@ -16,7 +16,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:74:5)",
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:73:5)",
         "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
         "...node internals..."
       ]

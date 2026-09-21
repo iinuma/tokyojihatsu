@@ -129,18 +129,6 @@
    "Type": "AWS::Lambda::Url",
    "Properties": {
     "AuthType": "NONE",
-    "Cors": {
-     "AllowHeaders": [
-      "Content-Type"
-     ],
-     "AllowMethods": [
-      "GET"
-     ],
-     "AllowOrigins": [
-      "*"
-     ],
-     "MaxAge": 86400
-    },
     "TargetFunctionArn": {
      "Fn::GetAtt": [
       "OdptProxy0F735FE2",
