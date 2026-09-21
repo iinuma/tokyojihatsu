@@ -16,7 +16,7 @@
     "app:dev": "LAN_IP=$(./scripts/lan-ip.sh) vite --config app/vite.config.ts",
     "app:build": "vite build --config app/vite.config.ts",
     "app:pack": "npm run app:build && evenhub pack app/app.json dist/app -o dist/tokyojihatsu.ehpk --sdk-ver 0.0.15",
-    "app:qr": "evenhub qr --url \"http://$(./scripts/lan-ip.sh):5174\""
+    "app:qr": "evenhub qr --url \"http://$(./scripts/lan-ip.sh):5175\""
   },
   "devDependencies": {
     "@evenrealities/even_hub_sdk": "^0.0.15",

@@ -55,6 +55,9 @@ const master = masterData as unknown as StationMaster;
 /** ODPT ガイドライン 3.1 で表示が要る連絡先。公開前に専用アドレスへ差し替える。 */
 const CONTACT_EMAIL = 'async.sync@gmail.com';
 
+/** 徒歩圏に対応駅が無かったときに広げる範囲。 */
+const WIDE_SEARCH_METERS = 30_000;
+
 const TICK_MS = 1000;
 const BRIDGE_TIMEOUT_MS = 3000;
 
@@ -75,6 +78,7 @@ let pageCreated = false;
 
 let currentLocation: { lat: number; lng: number } | null = null;
 let nearby: NearbyStation[] = [];
+let nearbyHeadline = '近くの駅';
 let selectedGroup: StationGroup | null = null;
 let directionOptions: DirectionOption[] = [];
 let selection: { station: MasterStation; direction: DirectionOption['direction'] } | null = null;
@@ -128,7 +132,7 @@ function menu(): MenuContainerProperty {
 function currentPage(): PageContainers {
   switch (screen) {
     case 'stations':
-      return stationPickerPage(nearby);
+      return stationPickerPage(nearby, nearbyHeadline);
     case 'directions':
       return directionPickerPage(selectedGroup?.name ?? '', directionOptions);
     case 'countdown': {
@@ -218,8 +222,32 @@ async function showStations(): Promise<void> {
   }
 
   nearby = service.nearbyStations(currentLocation, { limit: 12 });
+  nearbyHeadline = '近くの駅';
+
   if (nearby.length === 0) {
-    await showNotice('近くに対応している駅がありません。\n\n対応: 東京メトロ / 都営 / 横浜市営 /\nTX / 多摩モノレール / ゆりかもめ / りんかい線');
+    // 徒歩圏に無ければ範囲を広げて最寄りを出す。ODPT で時刻表が取れるのは
+    // 7 事業者だけなので、JR・東急・京急しか通っていない地域では徒歩圏に
+    // 1 駅も無いことが普通にある。黙って「ありません」で終わらせない。
+    nearby = service.nearbyStations(currentLocation, {
+      limit: 12,
+      maxDistanceMeters: WIDE_SEARCH_METERS,
+    });
+    nearbyHeadline = '徒歩圏になし・最寄りの駅';
+  }
+
+  if (nearby.length === 0) {
+    await showNotice(
+      [
+        'この付近に対応している駅がありません。',
+        '',
+        '対応: 東京メトロ / 都営 / 横浜市営 /',
+        'TX / 多摩モノレール / ゆりかもめ /',
+        'りんかい線',
+        '',
+        'JR・東急・京急・京王・小田急・西武・東武は',
+        'ODPT が駅時刻表を出していないため扱えません。',
+      ].join('\n'),
+    );
     return;
   }
 

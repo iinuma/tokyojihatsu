@@ -20,7 +20,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1500,
   },
   server: {
-    port: 5174,
+    port: 5175,
     host: true,
     hmr: lanIp ? { host: lanIp } : undefined,
   },

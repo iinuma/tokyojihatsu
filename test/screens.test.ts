@@ -144,3 +144,22 @@ describe('表示ヘルパー', () => {
     assert.ok(truncateItem('a'.repeat(70)).endsWith('…'));
   });
 });
+
+describe('徒歩圏に対応駅がないとき', () => {
+  it('見出しを差し替えられる', () => {
+    const far = [
+      {
+        group: { name: '西馬込', lat: 0, lng: 0, entries: [] },
+        distanceMeters: 6430,
+        distanceLabel: '6.4km',
+      },
+    ];
+    const page = stationPickerPage(far, '徒歩圏になし・最寄りの駅');
+    assert.equal(page.textObject?.[0]?.content, '徒歩圏になし・最寄りの駅');
+    assert.deepEqual(page.listObject?.[0]?.itemContainer?.itemName, ['西馬込  6.4km']);
+  });
+
+  it('見出しを省くと「近くの駅」になる', () => {
+    assert.equal(stationPickerPage([]).textObject?.[0]?.content, '近くの駅');
+  });
+});

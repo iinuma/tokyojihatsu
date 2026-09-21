@@ -43,15 +43,24 @@ function textContainer(
   });
 }
 
-/** 近くの駅を選ぶ画面。 */
-export function stationPickerPage(nearby: readonly NearbyStation[]): PageContainers {
+/**
+ * 駅を選ぶ画面。
+ *
+ * 見出しを差し替えられるようにしてあるのは、徒歩圏に対応駅がないときに
+ * 範囲を広げて「最寄り」を出すため。ODPT で時刻表が取れるのは 7 事業者だけなので、
+ * JR・東急・京急しか通っていない地域では徒歩圏に 1 駅も無いことが普通にある。
+ */
+export function stationPickerPage(
+  nearby: readonly NearbyStation[],
+  headline = '近くの駅',
+): PageContainers {
   const items = nearby
     .slice(0, MAX_ITEMS)
     .map((entry) => truncateItem(`${entry.group.name}  ${entry.distanceLabel}`));
 
   return {
     containerTotalNum: 2,
-    textObject: [textContainer(PICKER.header, '近くの駅', { color: DIM })],
+    textObject: [textContainer(PICKER.header, headline, { color: DIM })],
     listObject: [
       new ListContainerProperty({
         containerID: PICKER.list.id,
