@@ -1,0 +1,36 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "31683b2092dd0200c332f53c37ebdc64df2564baa94d84582e8625b3f4fd03a7": {
+      "displayName": "OdptProxy/Code",
+      "source": {
+        "path": "asset.31683b2092dd0200c332f53c37ebdc64df2564baa94d84582e8625b3f4fd03a7",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "473259746493-ap-northeast-1-a5ce6418": {
+          "bucketName": "cdk-hnb659fds-assets-473259746493-ap-northeast-1",
+          "objectKey": "31683b2092dd0200c332f53c37ebdc64df2564baa94d84582e8625b3f4fd03a7.zip",
+          "region": "ap-northeast-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::473259746493:role/cdk-hnb659fds-file-publishing-role-473259746493-ap-northeast-1"
+        }
+      }
+    },
+    "3c3dee4805b0c729fc2242c02b07a471fe27c4dad10e83b3be18b9b56b650edb": {
+      "displayName": "TokyojihatsuProxyStack Template",
+      "source": {
+        "path": "TokyojihatsuProxyStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "473259746493-ap-northeast-1-fde1b661": {
+          "bucketName": "cdk-hnb659fds-assets-473259746493-ap-northeast-1",
+          "objectKey": "3c3dee4805b0c729fc2242c02b07a471fe27c4dad10e83b3be18b9b56b650edb.json",
+          "region": "ap-northeast-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::473259746493:role/cdk-hnb659fds-file-publishing-role-473259746493-ap-northeast-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

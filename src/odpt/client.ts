@@ -41,7 +41,10 @@ export class OdptClient {
     for (const [key, value] of Object.entries(params)) {
       url.searchParams.set(key, value);
     }
-    url.searchParams.set('acl:consumerKey', this.consumerKey);
+    // プロキシ経由のときは鍵を持たない（サーバー側が付ける）。
+    if (this.consumerKey) {
+      url.searchParams.set('acl:consumerKey', this.consumerKey);
+    }
 
     const response = await this.fetchImpl(url.toString());
     if (!response.ok) {

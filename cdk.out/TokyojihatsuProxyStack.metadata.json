@@ -1,0 +1,169 @@
+{
+  "/TokyojihatsuProxyStack": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/ProxyUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ProxyUrl"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:74:5)",
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/OdptProxyLogs/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "OdptProxyLogs7F4100FD"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new LogGroup2 in aws-cdk-lib...",
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:31:22)",
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/OdptProxy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "OdptProxy0F735FE2"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new NodejsFunction in aws-cdk-lib...",
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:36:16)",
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/OdptProxy/invoke-function-url": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "OdptProxyinvokefunctionurlED19E4C9"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...NodejsFunction.addFunctionUrl in aws-cdk-lib...",
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:62:20)",
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/OdptProxy/invoke-function": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "OdptProxyinvokefunctionCD727FA1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...NodejsFunction.addFunctionUrl in aws-cdk-lib...",
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:62:20)",
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/OdptProxy/ServiceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "OdptProxyServiceRole97610DB2"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new NodejsFunction in aws-cdk-lib...",
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:36:16)",
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/OdptProxy/FunctionUrl/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "OdptProxyFunctionUrl2F74CDAD"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...NodejsFunction.addFunctionUrl in aws-cdk-lib...",
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:62:20)",
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/TokyojihatsuProxyStack/OdptProxy/ServiceRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "OdptProxyServiceRoleDefaultPolicy92720212"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...Import.grantRead in aws-cdk-lib...",
+        "new TokyojihatsuProxyStack (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/stack.ts:60:15)",
+        "<anonymous> (/Users/masahiroiinuma/Developer/Tokyojihatsu/proxy/infra/app.ts:19:1)",
+        "...node internals..."
+      ]
+    }
+  ]
+}

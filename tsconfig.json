@@ -23,6 +23,7 @@
     "scripts",
     "test",
     "probe",
-    "app"
+    "app",
+    "proxy"
   ]
 }

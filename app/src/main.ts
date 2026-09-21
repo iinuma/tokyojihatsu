@@ -138,6 +138,27 @@ function describeError(error: unknown): string {
   return String(error).slice(0, 120);
 }
 
+/**
+ * ODPT への口を作る。
+ *
+ * プロキシの URL が設定されていればそちらを使う。`.ehpk` は誰でも展開できるので、
+ * **公開ビルドではプロキシ必須**（FAQ:「Move keys behind a server-side proxy.」）。
+ * 鍵を直接埋めるのはローカル検証のときだけに留める。
+ */
+function createOdptClient(): OdptClient {
+  const proxyUrl = import.meta.env.VITE_ODPT_PROXY;
+  if (proxyUrl) {
+    // 鍵はプロキシ側が持つので、こちらは空でよい。
+    return new OdptClient({ consumerKey: '', baseUrl: proxyUrl });
+  }
+
+  const token = import.meta.env.VITE_ODPT_TOKEN;
+  if (!token) {
+    console.warn('VITE_ODPT_PROXY も VITE_ODPT_TOKEN も未設定です');
+  }
+  return new OdptClient({ consumerKey: token ?? '' });
+}
+
 function hasFlutterHost(): boolean {
   const handler = (globalThis as { flutter_inappwebview?: { callHandler?: unknown } })
     .flutter_inappwebview;
@@ -441,8 +462,7 @@ async function resumeIfPossible(): Promise<boolean> {
 }
 
 async function main(): Promise<void> {
-  const token = import.meta.env.VITE_ODPT_TOKEN;
-  service = new TokyoJihatsuService(master, new OdptClient({ consumerKey: token ?? '' }));
+  service = new TokyoJihatsuService(master, createOdptClient());
 
   const connection = await connectBridge();
   bridge = connection.hostConnected ? connection.bridge : null;

@@ -19,10 +19,16 @@
     "app:qr": "evenhub qr --url \"http://$(./scripts/lan-ip.sh):5175\""
   },
   "devDependencies": {
+    "@aws-sdk/client-ssm": "^3.1136.0",
     "@evenrealities/even_hub_sdk": "^0.0.15",
     "@evenrealities/evenhub-cli": "^0.1.14",
     "@evenrealities/evenhub-simulator": "^0.9.5",
+    "@types/aws-lambda": "^8.10.163",
     "@types/node": "^22.10.2",
+    "aws-cdk": "^2.1142.0",
+    "aws-cdk-lib": "^2.270.0",
+    "constructs": "^10.8.1",
+    "esbuild": "^0.28.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vite": "^6.4.3"

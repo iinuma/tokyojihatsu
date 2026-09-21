@@ -1,0 +1,9 @@
+{
+  "app": "npx tsx proxy/infra/app.ts",
+  "watch": { "exclude": ["**"] },
+  "context": {
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": false,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true
+  }
+}

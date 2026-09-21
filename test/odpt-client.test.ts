@@ -81,3 +81,19 @@ describe('ODPT クライアント', () => {
     );
   });
 });
+
+describe('プロキシ経由', () => {
+  it('鍵が空ならクエリに載せない', async () => {
+    // 鍵はプロキシ側が持つ。クライアントが空の consumerKey を送ると
+    // ODPT 側で弾かれるので、そもそも付けない。
+    const calls = spyFetch();
+    await new OdptClient({
+      consumerKey: '',
+      baseUrl: 'https://proxy.example.com',
+    }).stations('odpt.Operator:Toei');
+
+    const url = new URL(calls[0]!.url);
+    assert.equal(url.searchParams.has('acl:consumerKey'), false);
+    assert.equal(url.searchParams.get('odpt:operator'), 'odpt.Operator:Toei');
+  });
+});
