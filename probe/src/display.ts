@@ -18,6 +18,10 @@ export interface DisplayInput {
   storage: { web: boolean; host: boolean };
   location: { lat: number; lng: number; accuracy?: number } | null;
   imu: { x: number; y: number; z: number } | null;
+  /** 頭の上下角（度）と見上げ判定。 */
+  pitch: { degrees: number; up: boolean; enter: number; exit: number } | null;
+  /** 見上げたときだけ本文を出すデモが有効か。 */
+  peekDemo: boolean;
   device: { battery?: number; wearing?: boolean } | null;
   /** 直近に届いたイベントの短い説明。画面下に 1 行出す。 */
   lastEvent: string;
@@ -62,6 +66,14 @@ export function renderSummary(input: DisplayInput): string {
   if (imu) {
     const magnitude = Math.sqrt(imu.x ** 2 + imu.y ** 2 + imu.z ** 2);
     lines.push(`imu ${fixed(imu.x)} ${fixed(imu.y)} ${fixed(imu.z)}  |v|${magnitude.toFixed(2)}`);
+
+    if (input.pitch) {
+      const { degrees, up, enter, exit } = input.pitch;
+      lines.push(
+        `pitch ${degrees >= 0 ? '+' : ''}${degrees.toFixed(0)}deg  ${up ? '[UP]' : 'down'}  ` +
+          `th ${enter}/${exit}${input.peekDemo ? '  demo:on' : ''}`,
+      );
+    }
 
     const range = state.imuRange;
     if (range) {

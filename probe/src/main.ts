@@ -44,6 +44,7 @@ import {
   type ProbeState,
 } from './state.js';
 import { logPageCount, renderDump, renderLog, renderSummary } from './display.js';
+import { PeekDetector, pitchDegrees } from './pitch.js';
 
 const CONTAINER_ID = 1;
 const CONTAINER_NAME = 'probe';
@@ -52,8 +53,9 @@ const PERSIST_EVERY_TICKS = 5;
 const BRIDGE_TIMEOUT_MS = 3000;
 
 const MENU_CLEAR = 1;
-const MENU_DUMP = 2;
-const MENU_EXIT = 3;
+const MENU_PEEK = 2;
+const MENU_DUMP = 3;
+const MENU_EXIT = 4;
 
 type View = 'summary' | 'log';
 
@@ -68,6 +70,9 @@ let lastEvent = 'started';
 
 let location: { lat: number; lng: number; accuracy?: number } | null = null;
 let imu: { x: number; y: number; z: number } | null = null;
+const peek = new PeekDetector();
+/** 見上げたときだけ本文を出すデモ。案 2 が体験として成立するかを実機で試すため。 */
+let peekDemo = false;
 let device: { battery?: number; wearing?: boolean } | null = null;
 let storageFlags = { web: false, host: false };
 
@@ -119,6 +124,11 @@ function note(detail: string, kind: Parameters<typeof addEvent>[1] = 'note'): vo
 }
 
 function currentContent(): string {
+  // デモ中に下を向いていたら空にする。プラグインは前面固定なので表示を消すことは
+  // できないが、「見上げたときだけ読める」体験が成立するかはこれで確かめられる。
+  if (peekDemo && !peek.isUp) return ' ';
+
+  const thresholds = peek.thresholds;
   const input = {
     state,
     now: Date.now(),
@@ -126,6 +136,15 @@ function currentContent(): string {
     storage: storageFlags,
     location,
     imu,
+    pitch: imu
+      ? {
+          degrees: pitchDegrees(imu.x),
+          up: peek.isUp,
+          enter: thresholds.enter,
+          exit: thresholds.exit,
+        }
+      : null,
+    peekDemo,
     device,
     lastEvent,
   };
@@ -177,6 +196,7 @@ async function createPage(): Promise<void> {
       menuObject: new MenuContainerProperty({
         menuItems: [
           new MenuItemProperty({ itemID: MENU_CLEAR, itemName: 'Clear log' }),
+          new MenuItemProperty({ itemID: MENU_PEEK, itemName: 'Peek demo on/off' }),
           new MenuItemProperty({ itemID: MENU_DUMP, itemName: 'Dump to console' }),
           new MenuItemProperty({ itemID: MENU_EXIT, itemName: 'Exit' }),
         ],
@@ -215,6 +235,13 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
   if (sys?.eventType === OsEventTypeList.IMU_DATA_REPORT && sys.imuData) {
     imu = { x: sys.imuData.x ?? 0, y: sys.imuData.y ?? 0, z: sys.imuData.z ?? 0 };
     recordImu(state, imu.x, imu.y, imu.z);
+
+    // 見上げ・見下ろしの切り替わりだけ拾う。毎サンプル描画すると BLE が持たない。
+    const degrees = pitchDegrees(imu.x);
+    if (peek.update(degrees)) {
+      addEvent(state, 'note', `${peek.isUp ? '見上げ' : '下げ'} ${degrees.toFixed(0)}deg`);
+      await paint();
+    }
     return;
   }
 
@@ -270,6 +297,10 @@ async function handleMenu(itemID: number): Promise<void> {
       view = 'summary';
       logPage = 0;
       lastEvent = 'log cleared';
+      break;
+    case MENU_PEEK:
+      peekDemo = !peekDemo;
+      note(`peek demo ${peekDemo ? 'on' : 'off'}`, 'menu');
       break;
     case MENU_DUMP:
       console.log(renderDump(state));
