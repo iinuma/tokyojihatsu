@@ -44,7 +44,7 @@ import {
   type ProbeState,
 } from './state.js';
 import { logPageCount, renderDump, renderLog, renderSummary } from './display.js';
-import { PeekDetector, pitchDegrees } from './pitch.js';
+import { PeekDetector, pitchDegrees } from '../../src/core/pitch.js';
 
 const CONTAINER_ID = 1;
 const CONTAINER_NAME = 'probe';

@@ -1,0 +1,20 @@
+{
+  "package_id": "com.masahiroiinuma.tokyojihatsu",
+  "edition": "202601",
+  "name": "東京次発",
+  "version": "0.1.0",
+  "min_sdk_version": "0.0.15",
+  "entrypoint": "index.html",
+  "permissions": [
+    {
+      "name": "location",
+      "desc": "現在地から近くの駅を探すために使います。駅名を手で入力せずに済ませるためのもので、位置情報を外部に送信することはありません。"
+    },
+    {
+      "name": "network",
+      "desc": "公共交通オープンデータセンター（ODPT）から駅の時刻表を取得するために使います。",
+      "whitelist": ["https://api.odpt.org"]
+    }
+  ],
+  "supported_languages": ["ja", "en"]
+}

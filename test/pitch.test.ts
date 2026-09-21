@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { PeekDetector, pitchDegrees } from '../probe/src/pitch.js';
+import { PeekDetector, pitchDegrees } from '../src/core/pitch.js';
 
 describe('ピッチ角の算出', () => {
   it('水平は 0 度', () => {

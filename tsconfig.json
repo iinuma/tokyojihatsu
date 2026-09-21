@@ -14,13 +14,15 @@
     "skipLibCheck": true,
     "noEmit": true,
     "types": [
-      "node"
+      "node",
+      "vite/client"
     ]
   },
   "include": [
     "src",
     "scripts",
     "test",
-    "probe"
+    "probe",
+    "app"
   ]
 }

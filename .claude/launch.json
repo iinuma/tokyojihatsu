@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "app:dev"],
+      "port": 5174
+    },
+    {
       "name": "probe",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "probe:dev"],
