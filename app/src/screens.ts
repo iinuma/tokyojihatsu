@@ -12,7 +12,17 @@ import {
 import { formatCountdown, type Departure } from '../../src/core/departures.js';
 import type { MasterDirection, MasterStation } from '../../src/core/master.js';
 import type { NearbyStation } from '../../src/core/service.js';
-import { BRIGHT, COUNTDOWN, DIM, NOTICE, PICKER, padCenter, truncateItem } from './layout.js';
+import {
+  BRIGHT,
+  COUNTDOWN,
+  DIM,
+  DISTANCE_COLUMN,
+  NOTICE,
+  PICKER,
+  padCenter,
+  padToColumn,
+  truncateItem,
+} from './layout.js';
 
 /** List コンテナは 20 項目まで。 */
 const MAX_ITEMS = 20;
@@ -54,9 +64,12 @@ export function stationPickerPage(
   nearby: readonly NearbyStation[],
   headline = '近くの駅',
 ): PageContainers {
+  // 駅名は左端から、距離は画面中央あたりから始める。
   const items = nearby
     .slice(0, MAX_ITEMS)
-    .map((entry) => truncateItem(`${entry.group.name}  ${entry.distanceLabel}`));
+    .map((entry) =>
+      truncateItem(padToColumn(entry.group.name, DISTANCE_COLUMN) + entry.distanceLabel),
+    );
 
   return {
     containerTotalNum: 2,

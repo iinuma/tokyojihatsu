@@ -7,7 +7,7 @@ import {
   directionPickerPage,
   stationPickerPage,
 } from '../app/src/screens.js';
-import { truncateItem, visualWidth, padCenter } from '../app/src/layout.js';
+import { truncateItem, visualWidth, padCenter, padToColumn } from '../app/src/layout.js';
 import type { Departure } from '../src/core/departures.js';
 import type { MasterDirection, MasterStation } from '../src/core/master.js';
 
@@ -47,10 +47,13 @@ describe('駅選択画面', () => {
     { group: { name: '勝どき', lat: 0, lng: 0, entries: [] }, distanceMeters: 810, distanceLabel: '810m' },
   ];
 
-  it('駅名と距離を並べる', () => {
+  it('駅名は左端から、距離は同じ桁から始める', () => {
     const page = stationPickerPage(nearby);
     const items = page.listObject?.[0]?.itemContainer?.itemName ?? [];
-    assert.deepEqual(items, ['月島  60m', '勝どき  810m']);
+    // 駅名の長さが違っても距離の開始位置が揃う
+    const starts = items.map((item) => item.indexOf(item.trim().split(/\s+/)[1]!));
+    assert.equal(visualWidth(items[0]!.slice(0, starts[0])), 20);
+    assert.equal(visualWidth(items[1]!.slice(0, starts[1])), 20);
   });
 
   it('List の上限 20 件で打ち切る', () => {
@@ -138,6 +141,17 @@ describe('表示ヘルパー', () => {
     assert.equal(padCenter('x'.repeat(30), 20), 'x'.repeat(30)); // 入らなければそのまま
   });
 
+  it('指定の桁まで空白で埋める', () => {
+    assert.equal(visualWidth(padToColumn('月島', 20)), 20);
+    assert.equal(visualWidth(padToColumn('品川シーサイド', 20)), 20);
+  });
+
+  it('桁を超える駅名は切らずに空白 1 つだけ足す', () => {
+    // 切ると読めなくなるので溢れさせる
+    const long = padToColumn('東京国際クルーズターミナル', 20);
+    assert.equal(long, '東京国際クルーズターミナル ');
+  });
+
   it('List の 1 項目を上限で切る', () => {
     assert.equal(truncateItem('abc', 10), 'abc');
     assert.equal(truncateItem('a'.repeat(70)).length, 60);
@@ -156,7 +170,11 @@ describe('徒歩圏に対応駅がないとき', () => {
     ];
     const page = stationPickerPage(far, '徒歩圏になし・最寄りの駅');
     assert.equal(page.textObject?.[0]?.content, '徒歩圏になし・最寄りの駅');
-    assert.deepEqual(page.listObject?.[0]?.itemContainer?.itemName, ['西馬込  6.4km']);
+    const items = page.listObject?.[0]?.itemContainer?.itemName ?? [];
+    assert.equal(items.length, 1);
+    assert.ok(items[0]!.startsWith('西馬込'));
+    assert.ok(items[0]!.endsWith('6.4km'));
+    assert.equal(visualWidth(items[0]!.replace(/6\.4km$/, '')), 20);
   });
 
   it('見出しを省くと「近くの駅」になる', () => {

@@ -69,6 +69,28 @@ function isFullWidth(char: string): boolean {
 }
 
 /**
+ * 左の文字列を指定の桁まで空白で埋め、続きが同じ位置から始まるようにする。
+ *
+ * フォントは等幅ではないが、駅名はほぼ全角なので全角＝半角 2 桁として数えれば
+ * 実用上は揃う。桁を超える長い駅名（「東京国際クルーズターミナル」など）は
+ * 切らずに溢れさせ、最低 1 つの空白だけ入れる。切ると読めなくなるため。
+ */
+export function padToColumn(left: string, column: number): string {
+  const width = visualWidth(left);
+  if (width >= column) return `${left} `;
+  return left + ' '.repeat(column - width);
+}
+
+/**
+ * 画面幅 576px をこのフォントで割ったときの、おおよその半角桁数。
+ * 実機の probe 画面から読み取った概算（半角 1 文字 ≒ 14px）。
+ */
+export const APPROX_COLUMNS = 41;
+
+/** 駅名の右に距離を置く位置。画面の中央あたり。 */
+export const DISTANCE_COLUMN = 20;
+
+/**
  * List コンテナの 1 項目に収まるよう切り詰める。
  * firmware の上限は 64 文字。溢れると黙って落ちるので手前で切る。
  */
