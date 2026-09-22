@@ -15,6 +15,8 @@ export const DIM = 2;
 
 /** カウントダウン画面のコンテナ。 */
 export const COUNTDOWN = {
+  /** 左上端の日時。日・曜日・時分秒。 */
+  clock: { id: 4, name: 'clock', x: 0, y: 0, width: 260, height: 34 },
   /** 「あと 3:42」。上部の左寄りに置き、スペースで中央付近まで送る。 */
   remaining: { id: 1, name: 'remaining', x: 0, y: 56, width: 340, height: 72 },
   /** 「次発 18:42 / 次々発 18:49」。右上 2 行。 */

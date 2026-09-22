@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 
 import {
   aboutText,
+  clockText,
   countdownTexts,
   directionPickerPage,
   stationPickerPage,
@@ -182,5 +183,34 @@ describe('徒歩圏に対応駅がないとき', () => {
 
   it('見出しを省くと「近くの駅」になる', () => {
     assert.equal(stationPickerPage([]).textObject?.[0]?.content, '近くの駅');
+  });
+});
+
+describe('左上の時計', () => {
+  it('日・曜日・時分秒を JST で出す', () => {
+    // 2026-09-22 05:26:13 JST = 2026-09-21 20:26:13 UTC
+    const at = Date.parse('2026-09-21T20:26:13Z');
+    assert.equal(clockText(at), '22(火) 05:26:13');
+  });
+
+  it('日付をまたぐ時刻でも JST で判定する', () => {
+    // UTC では 21 日だが JST では 22 日
+    assert.match(clockText(Date.parse('2026-09-21T15:00:00Z')), /^22\(火\) 00:00:00$/);
+  });
+
+  it('カウントダウン画面に時計が含まれる', () => {
+    const texts = countdownTexts(station, direction, [], Date.parse('2026-09-21T20:26:13Z'));
+    assert.equal(texts.clock, '22(火) 05:26:13');
+  });
+});
+
+describe('取得に失敗しているとき', () => {
+  it('黙って「次の電車なし」にせず、取得中だと示す', () => {
+    // 失敗を握り潰すと、利用者には「止まった」ようにしか見えない
+    const stale = countdownTexts(station, direction, [], Date.now(), { stale: true });
+    assert.match(stale.remaining, /時刻表を取得中/);
+
+    const normal = countdownTexts(station, direction, [], Date.now());
+    assert.match(normal.remaining, /次の電車なし/);
   });
 });

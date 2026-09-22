@@ -59,6 +59,18 @@ const CONTACT_EMAIL = 'async.sync+tokyojihatsu@gmail.com';
 /** 徒歩圏に対応駅が無かったときに広げる範囲。 */
 const WIDE_SEARCH_METERS = 30_000;
 
+/**
+ * 時刻表を引き直す最短間隔。
+ *
+ * これが無いと、残り本数が少なくなった時点から毎秒ネットワークを叩く。
+ * プロキシのレート制限（毎分 60）に当たって 429 が返り、カウントダウンが
+ * 黙って止まる。実際にこの症状が出た。
+ */
+const MIN_REFRESH_INTERVAL_MS = 30_000;
+
+/** これだけ続けて失敗したら、黙っていないで画面に出す。 */
+const FAILURES_BEFORE_NOTICE = 3;
+
 const TICK_MS = 1000;
 const BRIDGE_TIMEOUT_MS = 3000;
 
@@ -85,6 +97,13 @@ let directionOptions: DirectionOption[] = [];
 let selection: { station: MasterStation; direction: DirectionOption['direction'] } | null = null;
 let departures: Departure[] = [];
 let lastRemainingText = '';
+
+/** 時刻表の引き直しが進行中か。tick が重なって二重に走るのを防ぐ。 */
+let refreshInFlight = false;
+/** 最後に引き直しを試みた時刻。連打を防ぐ。 */
+let lastRefreshAt = 0;
+/** 連続で失敗した回数。黙って止まらないよう画面に出す判断に使う。 */
+let refreshFailures = 0;
 /** 直近の失敗理由。原因を実機で切り分けるため画面に出す。 */
 let lastError = '';
 
@@ -195,7 +214,11 @@ function currentPage(): PageContainers {
       return directionPickerPage(selectedGroup?.name ?? '', directionOptions);
     case 'countdown': {
       if (!selection) return noticePage('駅が選ばれていません');
-      return countdownPage(countdownTexts(selection.station, selection.direction, departures, Date.now()));
+      return countdownPage(
+        countdownTexts(selection.station, selection.direction, departures, Date.now(), {
+          stale: refreshFailures >= FAILURES_BEFORE_NOTICE,
+        }),
+      );
     }
     case 'about':
       return noticePage(aboutText(master.sourceDate, CONTACT_EMAIL));
@@ -232,13 +255,28 @@ async function updateRemaining(): Promise<void> {
   if (screen !== 'countdown' || !selection) return;
 
   const hidden = peekEnabled && !peek.isUp;
-  const texts = countdownTexts(selection.station, selection.direction, departures, Date.now());
+  const texts = countdownTexts(selection.station, selection.direction, departures, Date.now(), {
+    stale: refreshFailures >= FAILURES_BEFORE_NOTICE,
+  });
+
+  // 時計は秒が動くので毎回変わる。差分判定は残り時間側で行う。
   const content = hidden ? ' ' : texts.remaining;
-  if (content === lastRemainingText) return;
+  const unchanged = content === lastRemainingText;
   lastRemainingText = content;
 
   syncDom(currentPage());
   if (!bridge) return;
+
+  // 時計だけは毎秒書き換える。
+  await bridge.textContainerUpgrade(
+    new TextContainerUpgrade({
+      containerID: COUNTDOWN.clock.id,
+      containerName: COUNTDOWN.clock.name,
+      content: hidden ? ' ' : texts.clock,
+    }),
+  );
+
+  if (unchanged) return;
 
   await bridge.textContainerUpgrade(
     new TextContainerUpgrade({
@@ -371,26 +409,43 @@ async function showCountdown(
   await renderPage();
 }
 
-/** 発車済みの列車を落とし、残りが少なくなったら引き直す。 */
+/**
+ * 発車済みの列車を落とし、残りが少なくなったら引き直す。
+ *
+ * 気をつけている点が 3 つある。いずれも実機でカウントダウンが止まった原因。
+ * - 引き直しは最短 30 秒間隔。毎秒叩くとレート制限に当たって 429 になる
+ * - 進行中なら次を走らせない。tick が重なると departures を奪い合う
+ * - 失敗しても黙って止まらない。続くようなら画面に出す
+ */
 async function refreshDepartures(): Promise<void> {
-  if (!selection) return;
+  if (!selection || refreshInFlight) return;
 
   const now = Date.now();
-  const remaining = departures.filter((departure) => departure.at.getTime() > now);
+  const upcoming = departures.filter((departure) => departure.at.getTime() > now);
 
-  if (remaining.length !== departures.length) {
-    departures = remaining;
-    await renderPage();
+  // 発車済みを落とす。ここで rebuild はしない（ちらつくうえ状態が飛ぶ）。
+  // 次の updateRemaining が textContainerUpgrade で反映する。
+  if (upcoming.length !== departures.length) {
+    departures = upcoming;
+    lastRemainingText = '';
   }
 
-  if (remaining.length >= 2) return;
+  if (upcoming.length >= 2) return;
+  if (now - lastRefreshAt < MIN_REFRESH_INTERVAL_MS) return;
 
+  refreshInFlight = true;
+  lastRefreshAt = now;
   try {
     const snapshot = await service.countdown(selection.station, selection.direction, { count: 3 });
     departures = snapshot.departures;
-    await renderPage();
+    refreshFailures = 0;
+    lastRemainingText = '';
   } catch (error) {
-    console.warn('refresh failed', error);
+    refreshFailures += 1;
+    console.warn('refresh failed', refreshFailures, error);
+    lastRemainingText = '';
+  } finally {
+    refreshInFlight = false;
   }
 }
 
@@ -551,11 +606,11 @@ async function main(): Promise<void> {
     await showStations();
   }
 
+  // 表示は毎秒。引き直しは refreshDepartures 側で間隔を空ける。
+  // 表示と取得を同じ await の鎖に乗せると、通信待ちのあいだ時計が止まる。
   setInterval(() => {
-    void (async () => {
-      await updateRemaining();
-      await refreshDepartures();
-    })();
+    void updateRemaining();
+    void refreshDepartures();
   }, TICK_MS);
 }
 

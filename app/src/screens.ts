@@ -137,9 +137,26 @@ export function directionPickerPage(
 }
 
 export interface CountdownTexts {
+  clock: string;
   remaining: string;
   upcoming: string;
   footer: string;
+}
+
+const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'] as const;
+
+/**
+ * 左上に出す日時。「22(火) 05:26:13」。
+ * JST 固定で組み立てる。端末のタイムゾーン設定に振り回されないため。
+ */
+export function clockText(now: number): string {
+  const jst = new Date(now + 9 * 3600_000);
+  const day = jst.getUTCDate();
+  const weekday = WEEKDAYS[jst.getUTCDay()] ?? '';
+  const hh = String(jst.getUTCHours()).padStart(2, '0');
+  const mm = String(jst.getUTCMinutes()).padStart(2, '0');
+  const ss = String(jst.getUTCSeconds()).padStart(2, '0');
+  return `${day}(${weekday}) ${hh}:${mm}:${ss}`;
 }
 
 /**
@@ -151,12 +168,14 @@ export function countdownTexts(
   direction: MasterDirection,
   departures: readonly Departure[],
   now: number,
+  options: { stale?: boolean } = {},
 ): CountdownTexts {
   const [first, second] = departures;
 
+  // 取得に続けて失敗しているときは黙って止まらない。時刻表が古いことを示す。
   const remaining = first
     ? padCenter(`あと ${formatCountdown(first.at.getTime() - now)}`, 26)
-    : padCenter('次の電車なし', 26);
+    : padCenter(options.stale ? '時刻表を取得中…' : '次の電車なし', 26);
 
   const upcomingLines: string[] = [];
   if (first) upcomingLines.push(`次発 ${first.displayTime}${first.isLast ? ' 終' : ''}`);
@@ -168,14 +187,15 @@ export function countdownTexts(
   // 常駐させる価値がない。遅延を反映しない旨はそちらに書いてある。
   const footer = `${station.name}　${station.railwayName}・${direction.label}`;
 
-  return { remaining, upcoming: upcomingLines.join('\n'), footer };
+  return { clock: clockText(now), remaining, upcoming: upcomingLines.join('\n'), footer };
 }
 
 /** カウントダウン画面のコンテナ。 */
 export function countdownPage(texts: CountdownTexts): PageContainers {
   return {
-    containerTotalNum: 3,
+    containerTotalNum: 4,
     textObject: [
+      textContainer(COUNTDOWN.clock, texts.clock, { color: DIM }),
       textContainer(COUNTDOWN.remaining, texts.remaining),
       textContainer(COUNTDOWN.upcoming, texts.upcoming),
       // 入力は footer で受ける。カウントダウンは毎秒差し替えるので、
