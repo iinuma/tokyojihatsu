@@ -7,9 +7,12 @@
 
 ```bash
 npm run app:dev
-npx evenhub-simulator "http://localhost:5175/?lat=35.536&lng=139.73955" --automation-port 9898
+npx evenhub-simulator "http://localhost:5175/?lat=35.6569&lng=139.7547" --automation-port 9898
 curl -o shot.png http://127.0.0.1:9898/api/screenshot/glasses
 ```
+
+座標は**大門**（都営浅草線・大江戸線）。チャレンジ限定ライセンスが
+2027-03-12 で切れても、基本ライセンスだけで同じ画が撮れる場所を選んでいる。
 
 `?lat=&lng=` で現在地を渡している。**シミュレータは位置情報 API を持たない**
 （`getAppLocation` は unknown variant で失敗する）ため、これがないと
@@ -31,7 +34,7 @@ magick 03-countdown.png -background black -alpha remove -alpha off view.png
 
 | ファイル | 画面 |
 | --- | --- |
-| 01-stations.png | 近くの駅（大師橋 140m） |
+| 01-stations.png | 近くの駅（大門 50m） |
 | 02-directions.png | 方面の選択 |
 | 03-countdown.png | カウントダウン（主画面） |
 | 04-menu.png | コンテキストメニュー |

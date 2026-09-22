@@ -43,10 +43,13 @@ function station(id: string, name: string, lat: number, lng: number): MasterStat
   };
 }
 
-// 実機で問題が出た配置。自宅から大師橋 142m、西馬込 6.4km。
-const HOME = { lat: 35.536, lng: 139.73955 };
-const DAISHIBASHI = station('daishibashi', '大師橋', 35.5372, 139.7385);
-const NISHIMAGOME = station('nishimagome', '西馬込', 35.5852, 139.7107);
+/**
+ * 実機で出た問題と同じ配置を、基本ライセンスだけで成り立つ場所に置き換えたもの。
+ * 目の前に駅があるのに、前回選んだ遠い駅が復元され続ける、という状況。
+ */
+const HOME = { lat: 35.6569, lng: 139.7547 };
+const NEAR_STATION = station('daimon', '大門', 35.6569, 139.7547);
+const FAR_STATION = station('kasuga', '春日', 35.709, 139.7529);
 const OPTIONS = { resumeRadius: 500, maxExtraMeters: 500 };
 
 describe('前回の選択を復元するか', () => {
@@ -55,8 +58,8 @@ describe('前回の選択を復元するか', () => {
     // 距離だけで判断すると、同じ場所にいる限り遠い駅が復元され続ける
     const resume = shouldResume(
       HOME,
-      { ...HOME, stationId: NISHIMAGOME.id },
-      [DAISHIBASHI, NISHIMAGOME],
+      { ...HOME, stationId: FAR_STATION.id },
+      [NEAR_STATION, FAR_STATION],
       OPTIONS,
     );
     assert.equal(resume, false);
@@ -65,8 +68,8 @@ describe('前回の選択を復元するか', () => {
   it('その駅が最寄りなら復元する', () => {
     const resume = shouldResume(
       HOME,
-      { ...HOME, stationId: DAISHIBASHI.id },
-      [DAISHIBASHI, NISHIMAGOME],
+      { ...HOME, stationId: NEAR_STATION.id },
+      [NEAR_STATION, FAR_STATION],
       OPTIONS,
     );
     assert.equal(resume, true);
@@ -76,16 +79,16 @@ describe('前回の選択を復元するか', () => {
     const faraway = { lat: 35.68, lng: 139.76 };
     const resume = shouldResume(
       faraway,
-      { ...HOME, stationId: DAISHIBASHI.id },
-      [DAISHIBASHI, NISHIMAGOME],
+      { ...HOME, stationId: NEAR_STATION.id },
+      [NEAR_STATION, FAR_STATION],
       OPTIONS,
     );
     assert.equal(resume, false);
   });
 
   it('少しだけ遠い駅なら復元する（乗り換えの都合で隣駅を使うことがある）', () => {
-    const nearby = station('near', '近い駅', 35.5365, 139.7397);
-    const slightly = station('slightly', 'やや遠い駅', 35.5382, 139.7402);
+    const nearby = station('near', '近い駅', 35.6569, 139.7547);
+    const slightly = station('slightly', 'やや遠い駅', 35.6569 + 0.0022, 139.7547 + 0.0005);
     const resume = shouldResume(
       HOME,
       { ...HOME, stationId: slightly.id },
@@ -98,8 +101,8 @@ describe('前回の選択を復元するか', () => {
   it('候補が 1 駅しかなければ復元する', () => {
     const resume = shouldResume(
       HOME,
-      { ...HOME, stationId: NISHIMAGOME.id },
-      [NISHIMAGOME],
+      { ...HOME, stationId: FAR_STATION.id },
+      [FAR_STATION],
       OPTIONS,
     );
     assert.equal(resume, true);

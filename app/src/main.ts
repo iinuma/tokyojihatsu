@@ -222,7 +222,7 @@ function createOdptClient(): OdptClient {
 }
 
 /**
- * URL で指定された現在地。`?lat=35.536&lng=139.7395`
+ * URL で指定された現在地。`?lat=35.6569&lng=139.7547`
  *
  * シミュレータは位置情報 API を持たない（getAppLocation は
  * unknown variant で失敗する）ので、審査用のスクリーンショットも
