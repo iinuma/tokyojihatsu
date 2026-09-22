@@ -149,17 +149,18 @@ export interface CountdownTexts {
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'] as const;
 
 /**
- * 左上に出す日時。「22(火) 05:26:13」。
+ * 左上に出す日時。「09/22(火) 05:26:13」。
  * JST 固定で組み立てる。端末のタイムゾーン設定に振り回されないため。
  */
 export function clockText(now: number): string {
   const jst = new Date(now + 9 * 3600_000);
-  const day = jst.getUTCDate();
+  const month = String(jst.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(jst.getUTCDate()).padStart(2, '0');
   const weekday = WEEKDAYS[jst.getUTCDay()] ?? '';
   const hh = String(jst.getUTCHours()).padStart(2, '0');
   const mm = String(jst.getUTCMinutes()).padStart(2, '0');
   const ss = String(jst.getUTCSeconds()).padStart(2, '0');
-  return `${day}(${weekday}) ${hh}:${mm}:${ss}`;
+  return `${month}/${day}(${weekday}) ${hh}:${mm}:${ss}`;
 }
 
 /**

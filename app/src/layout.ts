@@ -22,13 +22,13 @@ export const DIM = 2;
  */
 export const COUNTDOWN = {
   /** 左上端の日時。日・曜日・時分秒。 */
-  clock: { id: 4, name: 'clock', x: 0, y: 0, width: 212, height: 38 },
+  clock: { id: 4, name: 'clock', x: 0, y: 0, width: 256, height: 38 },
   /** 日時の右。駅・路線・方面。 */
-  header: { id: 5, name: 'header', x: 212, y: 0, width: 364, height: 38 },
+  header: { id: 5, name: 'header', x: 256, y: 0, width: 320, height: 38 },
   /** 残り時間。左寄せで大きく取る。 */
-  remaining: { id: 1, name: 'remaining', x: 0, y: 92, width: 316, height: 72 },
+  remaining: { id: 1, name: 'remaining', x: 0, y: 64, width: 316, height: 72 },
   /** 次発・次々発の 2 行。 */
-  upcoming: { id: 2, name: 'upcoming', x: 320, y: 84, width: 256, height: 84 },
+  upcoming: { id: 2, name: 'upcoming', x: 320, y: 56, width: 256, height: 84 },
 } as const;
 
 /** 一覧画面（駅選択・方面選択）のコンテナ。 */
@@ -99,13 +99,13 @@ export const APPROX_COLUMNS = 41;
 export const DISTANCE_COLUMN = 20;
 
 /**
- * 上段の駅・方面に使える見た目の桁数（364px ÷ 半角 14px ≒ 26）。
+ * 上段の駅・方面に使える見た目の桁数（320px ÷ 半角 14px ≒ 22）。
  *
- * 時計が 15 桁（212px）なので、残りがこれだけ。路線名まで入れると
- * 26 桁を超える駅が半分以上あるため、入らなければ路線名を落とす。
+ * 時計が 18 桁（「09/23(水) 08:17:57」= 256px）なので、残りがこれだけ。
+ * 路線名まで入る駅は限られるので、入らなければ路線名を落とす。
  * 方面ラベルが行先駅名なので、路線はそこから概ね察しがつく。
  */
-export const HEADER_COLUMNS = 26;
+export const HEADER_COLUMNS = 22;
 
 /**
  * 見た目の幅で切り詰める。

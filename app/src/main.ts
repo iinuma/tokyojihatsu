@@ -82,6 +82,14 @@ const RESUME_MAX_EXTRA_METERS = 500;
 const TICK_MS = 1000;
 const BRIDGE_TIMEOUT_MS = 3000;
 
+/**
+ * 起動画面を最低これだけ出す。
+ *
+ * 位置情報がすぐ返ると一瞬で消えて、見上げ表示が有効だと気づけない。
+ * かといって長いと起動の邪魔になるので、読み取れる最短にとどめる。
+ */
+const SPLASH_MIN_MS = 700;
+
 const MENU_RESELECT = 1;
 const MENU_PEEK = 2;
 const MENU_ABOUT = 3;
@@ -601,7 +609,12 @@ async function resumeIfPossible(): Promise<boolean> {
   return true;
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function main(): Promise<void> {
+  const splashUntil = Date.now() + SPLASH_MIN_MS;
   service = new TokyoJihatsuService(master, createOdptClient(), createChallengeClient());
 
   const connection = await connectBridge();
@@ -656,6 +669,10 @@ async function main(): Promise<void> {
       console.warn('imu failed', error);
     }
   }
+
+  // 位置情報がすぐ返っても、起動画面は読み取れるだけ出す。
+  const splashLeft = splashUntil - Date.now();
+  if (splashLeft > 0) await sleep(splashLeft);
 
   if (!(await resumeIfPossible())) {
     await showStations();

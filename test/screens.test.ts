@@ -103,7 +103,8 @@ describe('カウントダウン画面', () => {
     assert.match(texts.remaining, /あと 3:5\d|あと 4:00/);
     assert.equal(texts.upcoming, '次発 20:23\n次々発 20:30');
     // 駅・路線・方面は上段へ移した
-    assert.equal(texts.header, '月島 大江戸線・光が丘方面');
+    // 22 桁に収まらないので路線名が落ちる
+    assert.equal(texts.header, '月島 光が丘方面');
   });
 
   it('終電には印を付ける', () => {
@@ -192,17 +193,17 @@ describe('左上の時計', () => {
   it('日・曜日・時分秒を JST で出す', () => {
     // 2026-09-22 05:26:13 JST = 2026-09-21 20:26:13 UTC
     const at = Date.parse('2026-09-21T20:26:13Z');
-    assert.equal(clockText(at), '22(火) 05:26:13');
+    assert.equal(clockText(at), '09/22(火) 05:26:13');
   });
 
   it('日付をまたぐ時刻でも JST で判定する', () => {
     // UTC では 21 日だが JST では 22 日
-    assert.match(clockText(Date.parse('2026-09-21T15:00:00Z')), /^22\(火\) 00:00:00$/);
+    assert.match(clockText(Date.parse('2026-09-21T15:00:00Z')), /^09\/22\(火\) 00:00:00$/);
   });
 
   it('カウントダウン画面に時計が含まれる', () => {
     const texts = countdownTexts(station, direction, [], Date.parse('2026-09-21T20:26:13Z'));
-    assert.equal(texts.clock, '22(火) 05:26:13');
+    assert.equal(texts.clock, '09/22(火) 05:26:13');
   });
 });
 
@@ -241,20 +242,21 @@ describe('上段の駅・方面', () => {
 
   it('入るなら路線名まで出す', () => {
     const text = headerText(station, direction);
-    assert.equal(text, '月島 大江戸線・光が丘方面');
-    assert.ok(visualWidth(text) <= 26);
+    // 22 桁に収まらないので路線名が落ちる
+    assert.equal(text, '月島 光が丘方面');
+    assert.ok(visualWidth(text) <= 22);
   });
 
   it('入らなければ路線名を落とす', () => {
     const text = headerText(longStation, { ...direction, label: '新橋方面' });
     assert.equal(text.includes('ゆりかもめ'), false);
-    assert.ok(visualWidth(text) <= 26, `${visualWidth(text)} 桁`);
+    assert.ok(visualWidth(text) <= 22, `${visualWidth(text)} 桁`);
   });
 
   it('それでも入らなければ幅で切る（文字数ではなく）', () => {
     // 全角ばかりの駅名を文字数で切ると実際の 2 倍の幅になって溢れる
     const text = headerText(longStation, { ...direction, label: '国際展示場方面' });
-    assert.ok(visualWidth(text) <= 26, `${visualWidth(text)} 桁: ${text}`);
+    assert.ok(visualWidth(text) <= 22, `${visualWidth(text)} 桁: ${text}`);
     assert.ok(text.endsWith('…'));
   });
 });
