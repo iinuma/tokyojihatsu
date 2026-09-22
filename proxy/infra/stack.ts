@@ -23,6 +23,11 @@ export interface ProxyStackProps extends StackProps {
   tokenParameterName: string;
   /** アプリとの共有鍵を入れた SSM パラメータ名（SecureString）。 */
   appKeyParameterName: string;
+  /**
+   * チャレンジ限定ライセンス用トークンの SSM パラメータ名（SecureString）。
+   * 省略すると /challenge/ 以下は 404 を返す。
+   */
+  challengeTokenParameterName?: string;
 }
 
 export class TokyojihatsuProxyStack extends Stack {
@@ -46,6 +51,9 @@ export class TokyojihatsuProxyStack extends Stack {
         // 値ではなくパラメータ名だけを渡す。テンプレートにキーを残さないため。
         ODPT_TOKEN_PARAM: props.tokenParameterName,
         APP_KEY_PARAM: props.appKeyParameterName,
+        ...(props.challengeTokenParameterName
+          ? { ODPT_CHALLENGE_TOKEN_PARAM: props.challengeTokenParameterName }
+          : {}),
       },
       bundling: {
         format: undefined,
@@ -66,6 +74,15 @@ export class TokyojihatsuProxyStack extends Stack {
       parameterName: props.appKeyParameterName,
     });
     appKeyParameter.grantRead(fn);
+
+    if (props.challengeTokenParameterName) {
+      const challengeParameter = StringParameter.fromSecureStringParameterAttributes(
+        this,
+        'ChallengeToken',
+        { parameterName: props.challengeTokenParameterName },
+      );
+      challengeParameter.grantRead(fn);
+    }
 
     const url = fn.addFunctionUrl({
       // 公開アプリから叩くので認証は付けない。扱えるデータ型とクエリを

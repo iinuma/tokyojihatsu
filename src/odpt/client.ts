@@ -109,6 +109,18 @@ export class OdptClient {
       'odpt:operator': operator,
     });
   }
+
+  /**
+   * 路線単位の時刻表。
+   *
+   * 事業者単位で引くと 1000 件で打ち切られる事業者があるため（JR東日本は
+   * 実測でちょうど 1000 件だった）、そこだけ路線ごとに分けて取る。
+   */
+  stationTimetablesByRailway(railway: string): Promise<OdptStationTimetable[]> {
+    return this.get<OdptStationTimetable>('odpt:StationTimetable', {
+      'odpt:railway': railway,
+    });
+  }
 }
 
 export class OdptError extends Error {

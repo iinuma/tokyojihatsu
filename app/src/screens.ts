@@ -217,15 +217,28 @@ export function noticePage(body: string): PageContainers {
  * ODPT のガイドラインで表示が要る 3 点と取得日時。
  * 常時表示の義務はないので、コンテキストメニューから開くこの画面にまとめる。
  */
-export function aboutText(sourceDate: string, contactEmail: string): string {
-  return [
+export function aboutText(
+  sourceDate: string,
+  contactEmail: string,
+  options: { challengeExpiresAt?: string } = {},
+): string {
+  const lines = [
     'このアプリの時刻表データは',
     '公共交通オープンデータセンターの提供です。',
     'データの正確性・完全性は保証されていません。',
     '表示は時刻表上の予定時刻で、遅延は反映されません。',
-    `データ取得日時: ${sourceDate || '不明'}`,
-    `連絡先: ${contactEmail}`,
-    '',
-    'タップで戻る',
-  ].join('\n');
+  ];
+
+  // チャレンジ限定ライセンスのデータを含むことと、その期限を明示する。
+  // 期限後は対応範囲が基本ライセンスのぶんへ戻る。
+  if (options.challengeExpiresAt) {
+    lines.push(
+      `JR東日本・京急などの時刻表は公共交通オープンデータ`,
+      `チャレンジ限定ライセンスにより${options.challengeExpiresAt}まで`,
+      `提供されます。以降は対象駅が変わります。`,
+    );
+  }
+
+  lines.push(`データ取得日時: ${sourceDate || '不明'}`, `連絡先: ${contactEmail}`, '', 'タップで戻る');
+  return lines.join('\n');
 }

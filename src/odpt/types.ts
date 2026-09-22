@@ -16,6 +16,53 @@ export const TIMETABLE_OPERATORS = [
 
 export type OperatorId = (typeof TIMETABLE_OPERATORS)[number];
 
+/**
+ * 公共交通オープンデータチャレンジ限定ライセンスで駅時刻表が提供される事業者。
+ *
+ * 通常の API（api.odpt.org）では 0 件で、**別のエンドポイント
+ * api-challenge.odpt.org と専用トークン**が要る。チャレンジにエントリーすると
+ * トークンが発行される。
+ *
+ * 許諾は 2027-03-12 に終了し、データの削除が義務づけられている
+ * （チャレンジ限定ライセンス第 13 条）。期限後も動くよう、基本ライセンスの
+ * データとは分けて持つ。
+ */
+export const CHALLENGE_OPERATORS = [
+  'odpt.Operator:JR-East',
+  'odpt.Operator:Keikyu',
+  'odpt.Operator:Tokyu',
+  'odpt.Operator:Keio',
+  'odpt.Operator:Odakyu',
+  'odpt.Operator:Seibu',
+  'odpt.Operator:Tobu',
+  'odpt.Operator:Sotetsu',
+] as const;
+
+export type ChallengeOperatorId = (typeof CHALLENGE_OPERATORS)[number];
+
+export const CHALLENGE_OPERATOR_TITLES: Record<ChallengeOperatorId, string> = {
+  'odpt.Operator:JR-East': 'JR東日本',
+  'odpt.Operator:Keikyu': '京急',
+  'odpt.Operator:Tokyu': '東急',
+  'odpt.Operator:Keio': '京王',
+  'odpt.Operator:Odakyu': '小田急',
+  'odpt.Operator:Seibu': '西武',
+  'odpt.Operator:Tobu': '東武',
+  'odpt.Operator:Sotetsu': '相鉄',
+};
+
+/** チャレンジ用 API のベース URL。 */
+export const CHALLENGE_BASE_URL = 'https://api-challenge.odpt.org/api/v4';
+
+/**
+ * 事業者単位で時刻表を引くと 1000 件で打ち切られる事業者。
+ * 路線ごとに分けて取る必要がある（JR東日本は実測で 1000 件ちょうどだった）。
+ */
+export const PER_RAILWAY_OPERATORS: readonly string[] = ['odpt.Operator:JR-East'];
+
+/** チャレンジ限定データの利用期限。これを過ぎたら該当駅を候補から外す。 */
+export const CHALLENGE_EXPIRES_AT = '2027-03-12';
+
 export const OPERATOR_TITLES: Record<OperatorId, string> = {
   'odpt.Operator:TokyoMetro': '東京メトロ',
   'odpt.Operator:Toei': '都営',

@@ -16,6 +16,14 @@
  */
 
 const ODPT_BASE = 'https://api.odpt.org/api/v4';
+/**
+ * チャレンジ限定ライセンスのデータは別のエンドポイントと別のトークン。
+ * 通常の API では 0 件が返るだけで、混同すると原因が分かりにくい。
+ */
+const ODPT_CHALLENGE_BASE = 'https://api-challenge.odpt.org/api/v4';
+
+/** パスの先頭がこれならチャレンジ用に振り分ける。 */
+const CHALLENGE_PREFIX = '/challenge/';
 
 /** 中継してよいデータ型。これ以外は 404 にする。 */
 const ALLOWED_DATA_TYPES = new Set([
@@ -79,6 +87,11 @@ export interface ProxyOptions {
    * 「誰でも叩ける API として公開しない」ことであって、完全な防御ではない。
    */
   appKey?: string;
+  /**
+   * チャレンジ限定ライセンス用のトークン。
+   * 未設定なら /challenge/ 以下は 404 にする（データを持たないため）。
+   */
+  challengeToken?: string;
   /** 1 分あたりの上限。既定 60。0 で無効。 */
   rateLimitPerMinute?: number;
   fetchImpl?: typeof fetch;
@@ -182,18 +195,25 @@ export async function handleProxyRequest(
     return json(404, { error: `扱えないデータ型です: ${dataType ?? '(なし)'}` });
   }
 
-  if (!options.token) {
-    return json(500, { error: 'ODPT トークンが設定されていません' });
+  // /challenge/ で始まるパスはチャレンジ限定ライセンス側へ回す。
+  const useChallenge = request.path.startsWith(CHALLENGE_PREFIX);
+  const token = useChallenge ? options.challengeToken : options.token;
+
+  if (!token) {
+    return useChallenge
+      ? json(404, { error: 'チャレンジ限定データは提供していません' })
+      : json(500, { error: 'ODPT トークンが設定されていません' });
   }
 
-  const url = new URL(`${(options.baseUrl ?? ODPT_BASE).replace(/\/$/, '')}/${dataType}`);
+  const defaultBase = useChallenge ? ODPT_CHALLENGE_BASE : ODPT_BASE;
+  const url = new URL(`${(options.baseUrl ?? defaultBase).replace(/\/$/, '')}/${dataType}`);
   for (const [key, value] of Object.entries(request.query)) {
     if (value === undefined) continue;
     // 許可していないクエリは黙って落とす。キーの上書きも防ぐ。
     if (!ALLOWED_PARAMS.has(key)) continue;
     url.searchParams.set(key, value);
   }
-  url.searchParams.set('acl:consumerKey', options.token);
+  url.searchParams.set('acl:consumerKey', token);
 
   const doFetch = options.fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) =>
     globalThis.fetch(input, init));

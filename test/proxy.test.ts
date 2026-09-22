@@ -313,3 +313,45 @@ describe('レート制限', () => {
     }
   });
 });
+
+describe('チャレンジ限定データの振り分け', () => {
+  const CHALLENGE_TOKEN = 'challenge-only-token';
+
+  it('/challenge/ はチャレンジ用エンドポイントとトークンを使う', async () => {
+    // 通常の API では 0 件しか返らないので、取り違えると原因が分かりにくい
+    const { calls, fetchImpl } = upstream();
+    const response = await handleProxyRequest(
+      { path: '/challenge/api/v4/odpt:StationTimetable', query: {}, method: 'GET' },
+      { token: TOKEN, challengeToken: CHALLENGE_TOKEN, fetchImpl },
+    );
+
+    assert.equal(response.status, 200);
+    const url = new URL(calls[0]!);
+    assert.equal(url.host, 'api-challenge.odpt.org');
+    assert.equal(url.searchParams.get('acl:consumerKey'), CHALLENGE_TOKEN);
+  });
+
+  it('通常のパスは基本ライセンス側を使う', async () => {
+    const { calls, fetchImpl } = upstream();
+    await handleProxyRequest(
+      { path: '/api/v4/odpt:StationTimetable', query: {}, method: 'GET' },
+      { token: TOKEN, challengeToken: CHALLENGE_TOKEN, fetchImpl },
+    );
+
+    const url = new URL(calls[0]!);
+    assert.equal(url.host, 'api.odpt.org');
+    assert.equal(url.searchParams.get('acl:consumerKey'), TOKEN);
+  });
+
+  it('チャレンジ用トークンが無ければ 404 にして上流に投げない', async () => {
+    // 許諾が切れてトークンを消したあとも、この経路は静かに閉じる
+    const { calls, fetchImpl } = upstream();
+    const response = await handleProxyRequest(
+      { path: '/challenge/api/v4/odpt:StationTimetable', query: {}, method: 'GET' },
+      { token: TOKEN, fetchImpl },
+    );
+
+    assert.equal(response.status, 404);
+    assert.equal(calls.length, 0);
+  });
+});

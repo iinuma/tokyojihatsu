@@ -21,6 +21,7 @@ const station: MasterStation = {
   operatorName: '都営',
   railway: 'odpt.Railway:Toei.Oedo',
   railwayName: '大江戸線',
+  license: 'basic',
   directions: [],
 };
 
@@ -212,5 +213,20 @@ describe('取得に失敗しているとき', () => {
 
     const normal = countdownTexts(station, direction, [], Date.now());
     assert.match(normal.remaining, /次の電車なし/);
+  });
+});
+
+describe('チャレンジ限定データを含むとき', () => {
+  it('期限を「データについて」に明示する', () => {
+    const text = aboutText('2026-07-17', 'dev@example.com', {
+      challengeExpiresAt: '2027-03-12',
+    });
+    assert.match(text, /チャレンジ限定ライセンス/);
+    assert.match(text, /2027-03-12/);
+  });
+
+  it('含まないときは触れない', () => {
+    const text = aboutText('2026-07-17', 'dev@example.com');
+    assert.equal(/チャレンジ限定/.test(text), false);
   });
 });

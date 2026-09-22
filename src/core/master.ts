@@ -13,6 +13,12 @@ export interface MasterDirection {
   timetables: Partial<Record<CalendarId, string>>;
 }
 
+/**
+ * その駅のデータがどのライセンスで提供されているか。
+ * challenge は期限付きで、過ぎたら候補から外す。
+ */
+export type DataLicense = 'basic' | 'challenge';
+
 export interface MasterStation {
   id: string;
   name: string;
@@ -23,6 +29,7 @@ export interface MasterStation {
   railway: string;
   railwayName: string;
   stationCode?: string;
+  license: DataLicense;
   directions: MasterDirection[];
 }
 
@@ -30,6 +37,12 @@ export interface StationMaster {
   generatedAt: string;
   /** ODPT のデータ取得日時。ライセンス上、画面から辿れる場所に表示する必要がある。 */
   sourceDate: string;
+  /**
+   * チャレンジ限定データの利用期限（YYYY-MM-DD）。
+   * この日を過ぎたら license:'challenge' の駅を候補から外す。
+   * 期限後もアプリは壊れず、対応範囲が基本ライセンスの分だけに戻る。
+   */
+  challengeExpiresAt?: string;
   stationCount: number;
   stations: MasterStation[];
   /**
@@ -52,6 +65,25 @@ export interface StationGroup {
 }
 
 const GROUPING_RADIUS_METERS = 400;
+
+/**
+ * チャレンジ限定データが使える期間内か。
+ * 期限当日までは使える扱いにする。
+ */
+export function isChallengeUsable(master: StationMaster, now = new Date()): boolean {
+  if (!master.challengeExpiresAt) return false;
+  const [year, month, day] = master.challengeExpiresAt.split('-').map(Number);
+  if (!year || !month || !day) return false;
+  // 期限日の終わり（JST）まで有効とする。
+  const deadline = Date.UTC(year, month - 1, day + 1, -9, 0, 0, 0);
+  return now.getTime() < deadline;
+}
+
+/** いま候補に出してよい駅だけを返す。 */
+export function usableStations(master: StationMaster, now = new Date()): MasterStation[] {
+  if (isChallengeUsable(master, now)) return master.stations;
+  return master.stations.filter((station) => station.license !== 'challenge');
+}
 
 /** 駅名と位置が近いものを 1 つの駅としてまとめる。 */
 export function groupStations(stations: readonly MasterStation[]): StationGroup[] {

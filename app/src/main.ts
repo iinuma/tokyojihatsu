@@ -164,6 +164,26 @@ function describeError(error: unknown): string {
  * **公開ビルドではプロキシ必須**（FAQ:「Move keys behind a server-side proxy.」）。
  * 鍵を直接埋めるのはローカル検証のときだけに留める。
  */
+/**
+ * チャレンジ限定ライセンスのデータ用の口。
+ * エンドポイントもトークンも別なので、プロキシ側で /challenge/ に振り分ける。
+ */
+function createChallengeClient(): OdptClient | null {
+  const proxyUrl = import.meta.env.VITE_ODPT_PROXY;
+  if (!proxyUrl) return null;
+
+  const appKey = import.meta.env.VITE_PROXY_APP_KEY;
+  // .../api/v4 を .../challenge/api/v4 に差し替える
+  const challengeUrl = proxyUrl.replace(/\/api\/v4\/?$/, '/challenge/api/v4');
+  if (challengeUrl === proxyUrl) return null;
+
+  return new OdptClient({
+    consumerKey: '',
+    baseUrl: challengeUrl,
+    headers: appKey ? { 'X-Tokyojihatsu-Key': appKey } : {},
+  });
+}
+
 function createOdptClient(): OdptClient {
   const proxyUrl = import.meta.env.VITE_ODPT_PROXY;
   if (proxyUrl) {
@@ -221,7 +241,11 @@ function currentPage(): PageContainers {
       );
     }
     case 'about':
-      return noticePage(aboutText(master.sourceDate, CONTACT_EMAIL));
+      return noticePage(
+        aboutText(master.sourceDate, CONTACT_EMAIL, {
+          challengeExpiresAt: master.challengeExpiresAt,
+        }),
+      );
     case 'notice':
     default:
       return noticePage(noticeBody);
@@ -549,7 +573,7 @@ async function resumeIfPossible(): Promise<boolean> {
 }
 
 async function main(): Promise<void> {
-  service = new TokyoJihatsuService(master, createOdptClient());
+  service = new TokyoJihatsuService(master, createOdptClient(), createChallengeClient());
 
   const connection = await connectBridge();
   bridge = connection.hostConnected ? connection.bridge : null;

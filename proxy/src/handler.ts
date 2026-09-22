@@ -6,10 +6,14 @@
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 
 import { handleProxyRequest } from './proxy.js';
-import { resolveAppKey, resolveToken } from './token.js';
+import { resolveAppKey, resolveChallengeToken, resolveToken } from './token.js';
 
 export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> {
-  const [token, appKey] = await Promise.all([resolveToken(), resolveAppKey()]);
+  const [token, appKey, challengeToken] = await Promise.all([
+    resolveToken(),
+    resolveAppKey(),
+    resolveChallengeToken(),
+  ]);
 
   // ヘッダ名の大文字小文字は経路によって変わるので、小文字に揃える。
   const headers: Record<string, string | undefined> = {};
@@ -25,7 +29,7 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
       headers,
       sourceIp: event.requestContext?.http?.sourceIp,
     },
-    { token, appKey },
+    { token, appKey, challengeToken },
   );
 
   return { statusCode: response.status, headers: response.headers, body: response.body };

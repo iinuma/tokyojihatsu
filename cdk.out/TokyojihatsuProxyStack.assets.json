@@ -1,31 +1,31 @@
 {
   "version": "54.0.0",
   "files": {
-    "8afa4954892df8aa42d6465d975cb8897d89da40f5209bf9ba6f28bc9ee532fc": {
+    "9bdda60121facb9b3f5dce63adc4a722c1993473210c36792c07312c4a9d71fb": {
       "displayName": "OdptProxy/Code",
       "source": {
-        "path": "asset.8afa4954892df8aa42d6465d975cb8897d89da40f5209bf9ba6f28bc9ee532fc",
+        "path": "asset.9bdda60121facb9b3f5dce63adc4a722c1993473210c36792c07312c4a9d71fb",
         "packaging": "zip"
       },
       "destinations": {
-        "473259746493-ap-northeast-1-41c36fec": {
+        "473259746493-ap-northeast-1-0c0a8e68": {
           "bucketName": "cdk-hnb659fds-assets-473259746493-ap-northeast-1",
-          "objectKey": "8afa4954892df8aa42d6465d975cb8897d89da40f5209bf9ba6f28bc9ee532fc.zip",
+          "objectKey": "9bdda60121facb9b3f5dce63adc4a722c1993473210c36792c07312c4a9d71fb.zip",
           "region": "ap-northeast-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::473259746493:role/cdk-hnb659fds-file-publishing-role-473259746493-ap-northeast-1"
         }
       }
     },
-    "d35b3c8937e889aa8bb41f088f1622424b3d9f3e270ad0c3e746e91729d1fc31": {
+    "47d08e513265ff00e8181dcd02c8cc6bf6beaacdf0f810af88195a401d376957": {
       "displayName": "TokyojihatsuProxyStack Template",
       "source": {
         "path": "TokyojihatsuProxyStack.template.json",
         "packaging": "file"
       },
       "destinations": {
-        "473259746493-ap-northeast-1-6b5fa719": {
+        "473259746493-ap-northeast-1-812095c3": {
           "bucketName": "cdk-hnb659fds-assets-473259746493-ap-northeast-1",
-          "objectKey": "d35b3c8937e889aa8bb41f088f1622424b3d9f3e270ad0c3e746e91729d1fc31.json",
+          "objectKey": "47d08e513265ff00e8181dcd02c8cc6bf6beaacdf0f810af88195a401d376957.json",
           "region": "ap-northeast-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::473259746493:role/cdk-hnb659fds-file-publishing-role-473259746493-ap-northeast-1"
         }

@@ -17,10 +17,13 @@ const tokenParameterName =
   app.node.tryGetContext('tokenParam') ?? '/tokyojihatsu/odpt-token';
 const appKeyParameterName =
   app.node.tryGetContext('appKeyParam') ?? '/tokyojihatsu/app-key';
+const challengeTokenParameterName =
+  app.node.tryGetContext('challengeTokenParam') ?? '/tokyojihatsu/odpt-challenge-token';
 
 new TokyojihatsuProxyStack(app, 'TokyojihatsuProxyStack', {
   tokenParameterName,
   appKeyParameterName,
+  challengeTokenParameterName,
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION ?? 'ap-northeast-1',

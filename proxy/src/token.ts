@@ -49,6 +49,14 @@ export function resolveAppKey(): Promise<string> {
   return resolve('APP_KEY', 'APP_KEY_PARAM');
 }
 
+/**
+ * チャレンジ限定ライセンス用のトークン。
+ * 未設定ならチャレンジ側のデータは配信しない。
+ */
+export function resolveChallengeToken(): Promise<string> {
+  return resolve('ODPT_CHALLENGE_TOKEN', 'ODPT_CHALLENGE_TOKEN_PARAM');
+}
+
 /** テスト用。 */
 export function resetTokenCache(): void {
   cache.clear();
