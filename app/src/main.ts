@@ -221,6 +221,27 @@ function createOdptClient(): OdptClient {
   return new OdptClient({ consumerKey: token ?? '' });
 }
 
+/**
+ * URL で指定された現在地。`?lat=35.536&lng=139.7395`
+ *
+ * シミュレータは位置情報 API を持たない（getAppLocation は
+ * unknown variant で失敗する）ので、審査用のスクリーンショットも
+ * 開発中の画面確認もこれがないとできない。
+ * 実機では位置情報が取れるので、この値は使われない。
+ */
+function locationFromUrl(): { lat: number; lng: number } | null {
+  try {
+    const params = new URLSearchParams(globalThis.location?.search ?? '');
+    const lat = Number(params.get('lat'));
+    const lng = Number(params.get('lng'));
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    if (lat === 0 && lng === 0) return null;
+    return { lat, lng };
+  } catch {
+    return null;
+  }
+}
+
 function hasFlutterHost(): boolean {
   const handler = (globalThis as { flutter_inappwebview?: { callHandler?: unknown } })
     .flutter_inappwebview;
@@ -630,7 +651,10 @@ async function main(): Promise<void> {
     ['東京次発', '', peekEnabled ? '見上げ表示 ON' : '常時表示', '', '現在地を確認中…'].join('\n'),
   );
 
-  if (!bridge) {
+  // URL で指定されていれば、それを初期値にする（シミュレータ・開発用）。
+  currentLocation = locationFromUrl();
+
+  if (!bridge && !currentLocation) {
     // ブラウザで画面を確認するとき用の仮の現在地（月島）。
     // ホストが居ない＝実機ではないので、実際の利用には影響しない。
     currentLocation = { lat: 35.663757, lng: 139.783912 };
@@ -649,6 +673,7 @@ async function main(): Promise<void> {
         accuracy: AppLocationAccuracy.Medium,
         timeoutMs: 8000,
       });
+      // 取れなければ URL 指定（あれば）のままにする。
       if (fix) currentLocation = { lat: fix.latitude, lng: fix.longitude };
     } catch (error) {
       console.warn('location failed', error);
