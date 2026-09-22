@@ -71,6 +71,14 @@ const MIN_REFRESH_INTERVAL_MS = 30_000;
 /** これだけ続けて失敗したら、黙っていないで画面に出す。 */
 const FAILURES_BEFORE_NOTICE = 3;
 
+/**
+ * 前回の駅が、いまの最寄り駅よりこれ以上遠ければ選び直させる。
+ *
+ * 順位で見ると、候補が少ない場所では遠い駅も上位に入ってしまい判定にならない。
+ * 距離の差で見れば、候補の数に左右されない。
+ */
+const RESUME_MAX_EXTRA_METERS = 500;
+
 const TICK_MS = 1000;
 const BRIDGE_TIMEOUT_MS = 3000;
 
@@ -556,17 +564,38 @@ async function handleMenu(itemID: number): Promise<void> {
   }
 }
 
-/** 前回の選択が使えるなら、そのままカウントダウンに入る。 */
+/**
+ * 前回の選択が使えるなら、そのままカウントダウンに入る。
+ *
+ * 判断は 2 段構え。
+ * 1. 前に選んだ場所の近くにいるか（保存しているのは選択時の現在地）
+ * 2. **その駅が、いまの最寄り駅と比べて極端に遠くないか**
+ *
+ * 2 が要る。保存しているのは自分の位置であって駅の位置ではないので、
+ * 1 だけだと「同じ場所で起動した」という理由で、はるかに遠い駅が
+ * 復元され続ける。対応範囲が広がって近くに駅ができても気づけない
+ * （実際、6.4km 先の駅が復元されて 142m の駅が出なかった）。
+ */
 async function resumeIfPossible(): Promise<boolean> {
   const saved = await loadSelection(hostStorage);
   if (!saved || !currentLocation) return false;
 
-  const distance = distanceMeters(currentLocation, { lat: saved.lat, lng: saved.lng });
-  if (distance > RESUME_RADIUS_METERS) return false;
+  const movedFrom = distanceMeters(currentLocation, { lat: saved.lat, lng: saved.lng });
+  if (movedFrom > RESUME_RADIUS_METERS) return false;
 
   const station = master.stations.find((candidate) => candidate.id === saved.stationId);
   const direction = station?.directions.find((candidate) => candidate.id === saved.directionId);
   if (!station || !direction) return false;
+
+  // いまの最寄り駅と比べて、前回の駅が目に見えて遠ければ選び直させる。
+  const nearestNow = service.nearbyStations(currentLocation, {
+    limit: 1,
+    maxDistanceMeters: WIDE_SEARCH_METERS,
+  })[0];
+  if (nearestNow) {
+    const toSaved = distanceMeters(currentLocation, station);
+    if (toSaved - nearestNow.distanceMeters > RESUME_MAX_EXTRA_METERS) return false;
+  }
 
   await showCountdown(station, direction);
   return true;
