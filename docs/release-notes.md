@@ -3,7 +3,33 @@
 Even Hub の審査では `supported_languages` ごとに必要。1〜3 行、コードの変更では
 なく利用者にとって何が変わったかを書く。初版はアプリの説明にする。
 
-## 0.1.1
+## tagline（ポータルのプロジェクト設定・50 文字以内）
+
+```
+首都圏の駅で、次の電車まであと何分かを表示
+```
+
+対応範囲の駅数や事業者名は書かない。チャレンジ限定ライセンスのデータが
+2027-03-12 で切れると 1844 駅 → 440 駅に戻るうえ、Submitted 以降は
+メタデータを編集できないため。
+
+## 0.2.0
+
+### ja
+
+```
+近くの駅と方面を選ぶと、次の電車の発車時刻までの残り時間をG2に表示します。
+JR・私鉄・地下鉄に対応し、スマホを取り出さずにあと何分かを確認できます。
+```
+
+### en
+
+```
+Pick a nearby station and direction, then see the countdown to the next train on your G2.
+Covers JR, private railways and subways in the Tokyo area.
+```
+
+## 0.1.1（初版として提出する場合）
 
 ### ja
 
