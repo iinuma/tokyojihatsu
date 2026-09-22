@@ -117,14 +117,14 @@ let lastError = '';
 
 const peek = new PeekDetector();
 /**
- * 見上げたときだけカウントダウンを出すか。**既定は off（常時表示）。**
+ * 見上げたときだけカウントダウンを出すか。**既定は on。**
  *
- * 実機で既定 on にしたところ、装着して正面を向いている間はずっと消えたままで、
- * 起動しても「一瞬出て消える」ようにしか見えなかった。正面は見上げの閾値を
- * 下回るので当然ではあるが、既定の挙動としては事故に近い。
- * 見上げ表示そのものは体験として成立しているので、選べるものとして残す。
+ * 以前は off にしていた。見上げ判定の初期値が「伏せている」だったせいで、
+ * 起動しても「一瞬出て消える」ようにしか見えなかったため。いまは
+ * 見えている側から始まるので、起動直後は必ず読める。
+ * 起動画面でも有効であることを知らせて、消えたときに驚かせないようにする。
  */
-let peekEnabled = false;
+let peekEnabled = true;
 
 async function connectBridge(): Promise<{ bridge: EvenAppBridge | null; hostConnected: boolean }> {
   const candidate = await Promise.race([
@@ -327,9 +327,9 @@ async function updateRemaining(): Promise<void> {
   // 駅名も伏せる。ここが残っていると、伏せているつもりでも視界に文字が残る。
   await bridge.textContainerUpgrade(
     new TextContainerUpgrade({
-      containerID: COUNTDOWN.footer.id,
-      containerName: COUNTDOWN.footer.name,
-      content: hidden ? ' ' : texts.footer,
+      containerID: COUNTDOWN.header.id,
+      containerName: COUNTDOWN.header.name,
+      content: hidden ? ' ' : texts.header,
     }),
   );
 }
@@ -613,7 +613,9 @@ async function main(): Promise<void> {
     };
   }
 
-  await showNotice('現在地を確認中…');
+  await showNotice(
+    ['東京次発', '', peekEnabled ? '見上げ表示 ON' : '常時表示', '', '現在地を確認中…'].join('\n'),
+  );
 
   if (!bridge) {
     // ブラウザで画面を確認するとき用の仮の現在地（月島）。

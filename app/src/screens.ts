@@ -17,11 +17,13 @@ import {
   COUNTDOWN,
   DIM,
   DISTANCE_COLUMN,
+  HEADER_COLUMNS,
   NOTICE,
   PICKER,
-  padCenter,
   padToColumn,
   truncateItem,
+  truncateToWidth,
+  visualWidth,
 } from './layout.js';
 
 /** List コンテナは 20 項目まで。 */
@@ -138,9 +140,10 @@ export function directionPickerPage(
 
 export interface CountdownTexts {
   clock: string;
+  /** 上段の右。駅・路線・方面。 */
+  header: string;
   remaining: string;
   upcoming: string;
-  footer: string;
 }
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'] as const;
@@ -172,22 +175,41 @@ export function countdownTexts(
 ): CountdownTexts {
   const [first, second] = departures;
 
+  // 左寄せ。中央に寄せても等幅でないぶん揃わず、位置が読みにくくなるだけだった。
   // 取得に続けて失敗しているときは黙って止まらない。時刻表が古いことを示す。
   const remaining = first
-    ? padCenter(`あと ${formatCountdown(first.at.getTime() - now)}`, 26)
-    : padCenter(options.stale ? '時刻表を取得中…' : '次の電車なし', 26);
+    ? `あと ${formatCountdown(first.at.getTime() - now)}`
+    : options.stale
+      ? '時刻表を取得中…'
+      : '次の電車なし';
 
   const upcomingLines: string[] = [];
   if (first) upcomingLines.push(`次発 ${first.displayTime}${first.isLast ? ' 終' : ''}`);
   if (second) upcomingLines.push(`次々発 ${second.displayTime}${second.isLast ? ' 終' : ''}`);
   if (upcomingLines.length === 0) upcomingLines.push('終電後');
 
-  // 「時刻表ベース」の注記はここには置かない。ライセンス上の必須表示ではなく
-  // （必須の 3 点と取得日時は「データについて」にある）、毎秒見る画面に
-  // 常駐させる価値がない。遅延を反映しない旨はそちらに書いてある。
-  const footer = `${station.name}　${station.railwayName}・${direction.label}`;
+  return {
+    clock: clockText(now),
+    header: headerText(station, direction),
+    remaining,
+    upcoming: upcomingLines.join('\n'),
+  };
+}
 
-  return { clock: clockText(now), remaining, upcoming: upcomingLines.join('\n'), footer };
+/**
+ * 上段に出す「どの駅のどの方面か」。
+ *
+ * 路線名まで入れたいが、上段の幅は限られる。入らないときは路線名を落とす。
+ * 駅と方面が分かれば用は足り、路線は方面ラベルからも概ね察しがつく。
+ */
+export function headerText(station: MasterStation, direction: MasterDirection): string {
+  const full = `${station.name} ${station.railwayName}・${direction.label}`;
+  if (visualWidth(full) <= HEADER_COLUMNS) return full;
+
+  const short = `${station.name} ${direction.label}`;
+  if (visualWidth(short) <= HEADER_COLUMNS) return short;
+
+  return truncateToWidth(short, HEADER_COLUMNS);
 }
 
 /** カウントダウン画面のコンテナ。 */
@@ -196,11 +218,12 @@ export function countdownPage(texts: CountdownTexts): PageContainers {
     containerTotalNum: 4,
     textObject: [
       textContainer(COUNTDOWN.clock, texts.clock, { color: DIM }),
-      textContainer(COUNTDOWN.remaining, texts.remaining),
+      // 駅・方面は自分で選んだ情報なので明るさを落とす。文字サイズは変えられない。
+      textContainer(COUNTDOWN.header, texts.header, { color: DIM }),
+      // 入力はここで受ける。毎秒差し替わるが内容は短いので、
+      // 溢れによる firmware 側スクロールには掛からない。
+      textContainer(COUNTDOWN.remaining, texts.remaining, { capture: true }),
       textContainer(COUNTDOWN.upcoming, texts.upcoming),
-      // 入力は footer で受ける。カウントダウンは毎秒差し替えるので、
-      // 溢れたときの firmware 側スクロールに巻き込まれないようにしておく。
-      textContainer(COUNTDOWN.footer, texts.footer, { capture: true, color: DIM }),
     ],
   };
 }

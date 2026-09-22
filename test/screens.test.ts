@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 
 import {
   aboutText,
+  headerText,
   clockText,
   countdownTexts,
   directionPickerPage,
@@ -101,8 +102,8 @@ describe('カウントダウン画面', () => {
     const texts = countdownTexts(station, direction, [departure('20:23', 4), departure('20:30', 11)], now);
     assert.match(texts.remaining, /あと 3:5\d|あと 4:00/);
     assert.equal(texts.upcoming, '次発 20:23\n次々発 20:30');
-    // フッターは駅名と方面だけ。注記は「データについて」に移した
-    assert.equal(texts.footer, '月島　大江戸線・光が丘方面');
+    // 駅・路線・方面は上段へ移した
+    assert.equal(texts.header, '月島 大江戸線・光が丘方面');
   });
 
   it('終電には印を付ける', () => {
@@ -228,5 +229,32 @@ describe('チャレンジ限定データを含むとき', () => {
   it('含まないときは触れない', () => {
     const text = aboutText('2026-07-17', 'dev@example.com');
     assert.equal(/チャレンジ限定/.test(text), false);
+  });
+});
+
+describe('上段の駅・方面', () => {
+  const longStation: MasterStation = {
+    ...station,
+    name: '東京国際クルーズターミナル',
+    railwayName: 'ゆりかもめ',
+  };
+
+  it('入るなら路線名まで出す', () => {
+    const text = headerText(station, direction);
+    assert.equal(text, '月島 大江戸線・光が丘方面');
+    assert.ok(visualWidth(text) <= 26);
+  });
+
+  it('入らなければ路線名を落とす', () => {
+    const text = headerText(longStation, { ...direction, label: '新橋方面' });
+    assert.equal(text.includes('ゆりかもめ'), false);
+    assert.ok(visualWidth(text) <= 26, `${visualWidth(text)} 桁`);
+  });
+
+  it('それでも入らなければ幅で切る（文字数ではなく）', () => {
+    // 全角ばかりの駅名を文字数で切ると実際の 2 倍の幅になって溢れる
+    const text = headerText(longStation, { ...direction, label: '国際展示場方面' });
+    assert.ok(visualWidth(text) <= 26, `${visualWidth(text)} 桁: ${text}`);
+    assert.ok(text.endsWith('…'));
   });
 });

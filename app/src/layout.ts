@@ -13,16 +13,22 @@ export const SCREEN_HEIGHT = 288;
 export const BRIGHT = 4;
 export const DIM = 2;
 
-/** カウントダウン画面のコンテナ。 */
+/**
+ * カウントダウン画面のコンテナ。
+ *
+ * 上段に日時と「どの駅のどの方面か」を並べる。駅と方面は利用者が自分で選んだ
+ * 情報で、確認の頻度は低い。下に大きく置くと、見上げたとき真っ先に目へ入って
+ * しまうので、上段へ移して明るさも落としている（文字サイズは変えられない）。
+ */
 export const COUNTDOWN = {
   /** 左上端の日時。日・曜日・時分秒。 */
-  clock: { id: 4, name: 'clock', x: 0, y: 0, width: 260, height: 34 },
-  /** 「あと 3:42」。上部の左寄りに置き、スペースで中央付近まで送る。 */
-  remaining: { id: 1, name: 'remaining', x: 0, y: 56, width: 340, height: 72 },
-  /** 「次発 18:42 / 次々発 18:49」。右上 2 行。 */
-  upcoming: { id: 2, name: 'upcoming', x: 340, y: 44, width: 236, height: 80 },
-  /** 駅名・路線・方面と、時刻表ベースである旨。 */
-  footer: { id: 3, name: 'footer', x: 0, y: 214, width: 576, height: 66 },
+  clock: { id: 4, name: 'clock', x: 0, y: 0, width: 212, height: 38 },
+  /** 日時の右。駅・路線・方面。 */
+  header: { id: 5, name: 'header', x: 212, y: 0, width: 364, height: 38 },
+  /** 残り時間。左寄せで大きく取る。 */
+  remaining: { id: 1, name: 'remaining', x: 0, y: 92, width: 316, height: 72 },
+  /** 次発・次々発の 2 行。 */
+  upcoming: { id: 2, name: 'upcoming', x: 320, y: 84, width: 256, height: 84 },
 } as const;
 
 /** 一覧画面（駅選択・方面選択）のコンテナ。 */
@@ -91,6 +97,35 @@ export const APPROX_COLUMNS = 41;
 
 /** 駅名の右に距離を置く位置。画面の中央あたり。 */
 export const DISTANCE_COLUMN = 20;
+
+/**
+ * 上段の駅・方面に使える見た目の桁数（364px ÷ 半角 14px ≒ 26）。
+ *
+ * 時計が 15 桁（212px）なので、残りがこれだけ。路線名まで入れると
+ * 26 桁を超える駅が半分以上あるため、入らなければ路線名を落とす。
+ * 方面ラベルが行先駅名なので、路線はそこから概ね察しがつく。
+ */
+export const HEADER_COLUMNS = 26;
+
+/**
+ * 見た目の幅で切り詰める。
+ *
+ * 文字数で切ると、全角ばかりの駅名は実際の 2 倍の幅になって溢れる。
+ * 切った印として末尾に … を付ける。
+ */
+export function truncateToWidth(text: string, columns: number): string {
+  if (visualWidth(text) <= columns) return text;
+
+  let width = 0;
+  let out = '';
+  for (const char of text) {
+    const charWidth = isFullWidth(char) ? 2 : 1;
+    if (width + charWidth > columns - 1) break; // 省略記号のぶんを残す
+    out += char;
+    width += charWidth;
+  }
+  return `${out}…`;
+}
 
 /**
  * List コンテナの 1 項目に収まるよう切り詰める。
