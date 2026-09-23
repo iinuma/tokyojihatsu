@@ -513,6 +513,22 @@ async function refreshDepartures(): Promise<void> {
 async function handleEvent(event: EvenHubEvent): Promise<void> {
   const sys = event.sysEvent;
 
+  // 開発時だけ、届いたイベントの素性を残す。
+  // ダブルタップが期待どおり届いているかは、これを見ないと分からない。
+  if (import.meta.env.DEV && sys?.eventType !== OsEventTypeList.IMU_DATA_REPORT) {
+    console.log(
+      '[event]',
+      JSON.stringify({
+        screen,
+        text: event.textEvent?.eventType,
+        list: event.listEvent?.eventType,
+        sys: sys?.eventType,
+        menu: event.menuItemClickEvent?.itemID,
+        index: event.listEvent?.currentSelectItemIndex,
+      }),
+    );
+  }
+
   if (sys?.eventType === OsEventTypeList.IMU_DATA_REPORT && sys.imuData) {
     if (!peekEnabled || screen !== 'countdown') return;
     if (peek.update(pitchDegrees(sys.imuData.x ?? 0))) {
@@ -528,11 +544,16 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
     return;
   }
 
-  // ダブルタップはどの画面でも終了。審査はルートページで見るが、
-  // 画面ごとに振る舞いを変えると「ルート」の判定を取り違えたときに落ちる。
-  // システムの確認ダイアログが出るので、誤操作はそこで取り消せる。
-  if (isDoubleClick(event.textEvent?.eventType) || isDoubleClick(event.listEvent?.eventType)) {
-    await requestExit();
+  // ダブルタップは sysEvent で届く。
+  // ドキュメントは「textEvent / listEvent に届き、例外はコンテキストメニューと
+  // 長押しだけ」と書いているが、実測では sysEvent に来る（simulator 0.9.5）。
+  // textEvent / listEvent も見ておくのは、経路が変わっても取りこぼさないため。
+  if (
+    isDoubleClick(event.sysEvent?.eventType) ||
+    isDoubleClick(event.textEvent?.eventType) ||
+    isDoubleClick(event.listEvent?.eventType)
+  ) {
+    await handleBack();
     return;
   }
 
@@ -558,6 +579,30 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
       lastError = '';
       await showStations();
     }
+  }
+}
+
+/**
+ * ダブルタップの行き先。
+ *
+ * ドキュメントいわく「normally back, dismiss, or the exit dialog on a root page」。
+ * 内部の画面では前へ戻り、ルートでは終了確認を出す。
+ *
+ * ルートに当たるのは、起動して最初に出る画面——駅がまだ決まっていなければ
+ * 駅選択、前回の選択を復元したならカウントダウン。審査はそこを見る。
+ */
+async function handleBack(): Promise<void> {
+  switch (screen) {
+    case 'directions':
+      // 方面を選んでいる途中なら駅選択へ戻す。ここで終了すると操作をやり直せない。
+      await showStations();
+      return;
+    case 'about':
+      screen = selection ? 'countdown' : 'stations';
+      await renderPage();
+      return;
+    default:
+      await requestExit();
   }
 }
 

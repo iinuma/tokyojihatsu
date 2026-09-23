@@ -45,3 +45,52 @@ describe('ダブルタップの判定', () => {
     assert.equal(isDoubleClick(OsEventTypeList.SCROLL_TOP_EVENT), false);
   });
 });
+
+describe('ダブルタップの届き方', () => {
+  /** 本体（app/src/main.ts）と同じ判定。 */
+  function isDoubleTapEvent(event: {
+    sysEvent?: { eventType?: OsEventTypeList };
+    textEvent?: { eventType?: OsEventTypeList };
+    listEvent?: { eventType?: OsEventTypeList };
+  }): boolean {
+    return (
+      isDoubleClick(event.sysEvent?.eventType) ||
+      isDoubleClick(event.textEvent?.eventType) ||
+      isDoubleClick(event.listEvent?.eventType)
+    );
+  }
+
+  it('sysEvent で届いても拾う', () => {
+    // 実測ではここに来る。ドキュメントには書かれていない
+    assert.equal(
+      isDoubleTapEvent({ sysEvent: { eventType: OsEventTypeList.DOUBLE_CLICK_EVENT } }),
+      true,
+    );
+  });
+
+  it('textEvent / listEvent で届いても拾う', () => {
+    assert.equal(
+      isDoubleTapEvent({ textEvent: { eventType: OsEventTypeList.DOUBLE_CLICK_EVENT } }),
+      true,
+    );
+    assert.equal(
+      isDoubleTapEvent({ listEvent: { eventType: OsEventTypeList.DOUBLE_CLICK_EVENT } }),
+      true,
+    );
+  });
+
+  it('ただのタップをダブルタップと誤認しない', () => {
+    assert.equal(isDoubleTapEvent({ textEvent: { eventType: undefined } }), false);
+    assert.equal(
+      isDoubleTapEvent({ listEvent: { eventType: OsEventTypeList.CLICK_EVENT } }),
+      false,
+    );
+  });
+
+  it('長押しをダブルタップと誤認しない', () => {
+    assert.equal(
+      isDoubleTapEvent({ sysEvent: { eventType: OsEventTypeList.LONG_PRESS_EVENT } }),
+      false,
+    );
+  });
+});
