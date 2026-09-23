@@ -292,12 +292,20 @@ describe('遅延の表示', () => {
     assert.equal(texts.upcoming.split('\n')[0], '次発 24:21 (終 1分遅れ)');
   });
 
-  it('遅延を使ったらデータの生成時刻を出す', () => {
-    // 開発者ガイドライン 2.1 の求め
+  it('遅れているときは、その時点の遅れだと分かるように書く', () => {
+    // 開発者ガイドライン 2.1 が求めるデータ生成時刻でもある
     const texts = countdownTexts(station, direction, [delayed('07:57', 3, 60)], now, {
       delayGeneratedAt: new Date('2026-09-24T07:54:00+09:00'),
     });
-    assert.ok(texts.upcoming.includes('遅延 07:54時点'), texts.upcoming);
+    assert.ok(texts.upcoming.includes('07:54時点の遅れ'), texts.upcoming);
+  });
+
+  it('遅れていないときは「遅れなし」と書く', () => {
+    // 時刻だけだと、定刻なのか遅れているのかが読み取れない
+    const texts = countdownTexts(station, direction, [delayed('07:57', 3, 0)], now, {
+      delayGeneratedAt: new Date('2026-09-24T07:54:00+09:00'),
+    });
+    assert.ok(texts.upcoming.includes('07:54時点 遅れなし'), texts.upcoming);
   });
 
   it('遅延が取れない路線では生成時刻も出さない', () => {

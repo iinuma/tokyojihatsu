@@ -210,8 +210,13 @@ export function countdownTexts(
 
   // 遅延を使ったなら、そのデータが作られた時刻を出す義務がある
   // （開発者ガイドライン 2.1）。取れなかった路線では何も出さない。
+  //
+  // 時刻だけを出すと「遅れているのか定刻なのか」が読み取れず、
+  // 上の行を見返さないと分からない。遅れが無いときはそう書く。
   if (options.delayGeneratedAt) {
-    upcomingLines.push(`遅延 ${clockTimeOnly(options.delayGeneratedAt.getTime())}時点`);
+    const at = clockTimeOnly(options.delayGeneratedAt.getTime());
+    const anyDelay = departures.some((departure) => (departure.delaySeconds ?? 0) > 0);
+    upcomingLines.push(anyDelay ? `${at}時点の遅れ` : `${at}時点 遅れなし`);
   }
 
   return {
