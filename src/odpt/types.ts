@@ -147,3 +147,48 @@ export interface OdptStationTimetable {
   'dct:issued'?: string;
   'odpt:stationTimetableObject': OdptTimetableObject[];
 }
+
+/** 列車の現在位置。数分で古くなる動的データ。 */
+export interface OdptTrain {
+  'owl:sameAs': string;
+  /** データが作られた時刻。画面に出す義務がある（ガイドライン 2.1）。 */
+  'dc:date'?: string;
+  /** このデータが使える期限。過ぎたら表示しない。 */
+  'dct:valid'?: string;
+  'odpt:operator': string;
+  'odpt:railway': string;
+  'odpt:trainNumber'?: string;
+  'odpt:trainType'?: string;
+  /** 直前に出た駅。停車中はその駅。 */
+  'odpt:fromStation'?: string;
+  /** 次に着く駅。停車中は null。 */
+  'odpt:toStation'?: string | null;
+  'odpt:railDirection'?: string;
+  'odpt:destinationStation'?: string[];
+  'odpt:originStation'?: string[];
+  /** 遅延（秒）。事業者が公表している値。 */
+  'odpt:delay'?: number;
+}
+
+/** 列車時刻表の 1 停車分。 */
+export interface OdptTrainTimetableObject {
+  'odpt:arrivalTime'?: string;
+  'odpt:arrivalStation'?: string;
+  'odpt:departureTime'?: string;
+  'odpt:departureStation'?: string;
+}
+
+/** 列車ごとの時刻表。列車番号で位置と突き合わせる。 */
+export interface OdptTrainTimetable {
+  'owl:sameAs': string;
+  'odpt:operator': string;
+  'odpt:railway': string;
+  'odpt:train'?: string;
+  'odpt:trainNumber'?: string;
+  'odpt:trainType'?: string;
+  'odpt:calendar'?: string;
+  'odpt:railDirection'?: string;
+  'odpt:originStation'?: string[];
+  'odpt:destinationStation'?: string[];
+  'odpt:trainTimetableObject': OdptTrainTimetableObject[];
+}

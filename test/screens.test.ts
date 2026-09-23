@@ -109,7 +109,7 @@ describe('カウントダウン画面', () => {
 
   it('終電には印を付ける', () => {
     const texts = countdownTexts(station, direction, [departure('24:21', 5, true)], now);
-    assert.equal(texts.upcoming, '次発 24:21 終');
+    assert.equal(texts.upcoming, '次発 24:21 (終)');
   });
 
   it('次発がなければその旨を出す', () => {
@@ -258,5 +258,50 @@ describe('上段の駅・方面', () => {
     const text = headerText(longStation, { ...direction, label: '国際展示場方面' });
     assert.ok(visualWidth(text) <= 22, `${visualWidth(text)} 桁: ${text}`);
     assert.ok(text.endsWith('…'));
+  });
+});
+
+describe('遅延の表示', () => {
+  const now = Date.now();
+
+  function delayed(time: string, minutesFromNow: number, delaySeconds: number): Departure {
+    return {
+      at: new Date(now + minutesFromNow * 60_000),
+      scheduledTime: time,
+      displayTime: time,
+      isLast: false,
+      serviceDate: '2026-09-24',
+      calendar: 'odpt.Calendar:Weekday',
+      delaySeconds,
+    };
+  }
+
+  it('遅れている発車に印を付ける', () => {
+    const texts = countdownTexts(station, direction, [delayed('07:57', 3, 120)], now);
+    assert.equal(texts.upcoming.split('\n')[0], '次発 07:57 (2分遅れ)');
+  });
+
+  it('定刻には何も付けない', () => {
+    const texts = countdownTexts(station, direction, [delayed('07:57', 3, 0)], now);
+    assert.equal(texts.upcoming.split('\n')[0], '次発 07:57');
+  });
+
+  it('終電と遅延が重なれば両方出す', () => {
+    const last = { ...delayed('24:21', 5, 60), isLast: true };
+    const texts = countdownTexts(station, direction, [last], now);
+    assert.equal(texts.upcoming.split('\n')[0], '次発 24:21 (終 1分遅れ)');
+  });
+
+  it('遅延を使ったらデータの生成時刻を出す', () => {
+    // 開発者ガイドライン 2.1 の求め
+    const texts = countdownTexts(station, direction, [delayed('07:57', 3, 60)], now, {
+      delayGeneratedAt: new Date('2026-09-24T07:54:00+09:00'),
+    });
+    assert.ok(texts.upcoming.includes('遅延 07:54時点'), texts.upcoming);
+  });
+
+  it('遅延が取れない路線では生成時刻も出さない', () => {
+    const texts = countdownTexts(station, direction, [delayed('07:57', 3, 0)], now);
+    assert.equal(texts.upcoming.includes('時点'), false);
   });
 });

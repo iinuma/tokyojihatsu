@@ -10,6 +10,7 @@ import {
 } from '@evenrealities/even_hub_sdk';
 
 import { formatCountdown, type Departure } from '../../src/core/departures.js';
+import { formatDelay } from '../../src/core/train.js';
 import type { MasterDirection, MasterStation } from '../../src/core/master.js';
 import type { NearbyStation } from '../../src/core/service.js';
 import {
@@ -148,6 +149,24 @@ export interface CountdownTexts {
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'] as const;
 
+/** 時刻だけ（hh:mm）。JST 固定。 */
+export function clockTimeOnly(at: number): string {
+  const jst = new Date(at + 9 * 3600_000);
+  return `${String(jst.getUTCHours()).padStart(2, '0')}:${String(jst.getUTCMinutes()).padStart(2, '0')}`;
+}
+
+/**
+ * 発車時刻に添える印。終電と遅延。
+ * 定刻なら何も付けない。「0分遅れ」は書かない。
+ */
+function suffix(departure: Departure): string {
+  const parts: string[] = [];
+  if (departure.isLast) parts.push('終');
+  const delay = departure.delaySeconds ? formatDelay(departure.delaySeconds) : null;
+  if (delay) parts.push(delay);
+  return parts.length > 0 ? ` (${parts.join(' ')})` : '';
+}
+
 /**
  * 左上に出す日時。「09/22(火) 05:26:13」。
  * JST 固定で組み立てる。端末のタイムゾーン設定に振り回されないため。
@@ -172,7 +191,7 @@ export function countdownTexts(
   direction: MasterDirection,
   departures: readonly Departure[],
   now: number,
-  options: { stale?: boolean } = {},
+  options: { stale?: boolean; delayGeneratedAt?: Date | null } = {},
 ): CountdownTexts {
   const [first, second] = departures;
 
@@ -185,9 +204,15 @@ export function countdownTexts(
       : '次の電車なし';
 
   const upcomingLines: string[] = [];
-  if (first) upcomingLines.push(`次発 ${first.displayTime}${first.isLast ? ' 終' : ''}`);
-  if (second) upcomingLines.push(`次々発 ${second.displayTime}${second.isLast ? ' 終' : ''}`);
+  if (first) upcomingLines.push(`次発 ${first.displayTime}${suffix(first)}`);
+  if (second) upcomingLines.push(`次々発 ${second.displayTime}${suffix(second)}`);
   if (upcomingLines.length === 0) upcomingLines.push('終電後');
+
+  // 遅延を使ったなら、そのデータが作られた時刻を出す義務がある
+  // （開発者ガイドライン 2.1）。取れなかった路線では何も出さない。
+  if (options.delayGeneratedAt) {
+    upcomingLines.push(`遅延 ${clockTimeOnly(options.delayGeneratedAt.getTime())}時点`);
+  }
 
   return {
     clock: clockText(now),

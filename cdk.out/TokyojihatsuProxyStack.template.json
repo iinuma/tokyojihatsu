@@ -133,7 +133,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-473259746493-ap-northeast-1",
-     "S3Key": "9bdda60121facb9b3f5dce63adc4a722c1993473210c36792c07312c4a9d71fb.zip"
+     "S3Key": "ff8587ddb77d6acf9a4c25d6a7f07307a99155b8e1a37a8efcd6ee377339dc19.zip"
     },
     "Environment": {
      "Variables": {
@@ -164,7 +164,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "TokyojihatsuProxyStack/OdptProxy/Resource",
-    "aws:asset:path": "asset.9bdda60121facb9b3f5dce63adc4a722c1993473210c36792c07312c4a9d71fb",
+    "aws:asset:path": "asset.ff8587ddb77d6acf9a4c25d6a7f07307a99155b8e1a37a8efcd6ee377339dc19",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }

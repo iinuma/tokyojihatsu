@@ -6,6 +6,7 @@
 import { OdptClient } from '../odpt/client.js';
 import type { OdptStationTimetable } from '../odpt/types.js';
 import { calendarFor, toJstParts } from './calendar.js';
+import { buildDelayIndex, delayFor, type DelayIndex } from './train.js';
 import { findNextDepartures, type Departure } from './departures.js';
 import { formatDistance, nearest, type LatLng } from './geo.js';
 import {
@@ -40,10 +41,18 @@ export interface CountdownSnapshot {
   calendarReason: string;
   /** 次発が無い（終電後で翌日の始発も引けない等）。 */
   empty: boolean;
+  /**
+   * 遅延情報が作られた時刻。
+   * 動的データなので、使うなら画面に出す義務がある（ガイドライン 2.1）。
+   * 遅延が取れなかった路線では null。
+   */
+  delayGeneratedAt: Date | null;
 }
 
 export class TokyoJihatsuService {
   private readonly timetableCache = new Map<string, OdptStationTimetable>();
+  /** 路線ごとの遅延。短命なので取得時刻とともに持つ。 */
+  private readonly delayCache = new Map<string, { index: DelayIndex; fetchedAt: number }>();
   private readonly stationNames: Map<string, string>;
   /** 駅のグループ化は 1800 駅超を走査するので、期限の判定結果ごとに覚えておく。 */
   private groupCache: { challengeUsable: boolean; groups: StationGroup[] } | null = null;
@@ -119,7 +128,7 @@ export class TokyoJihatsuService {
   async countdown(
     station: MasterStation,
     direction: MasterDirection,
-    options: { now?: Date; count?: number } = {},
+    options: { now?: Date; count?: number; withDelay?: boolean } = {},
   ): Promise<CountdownSnapshot> {
     const client =
       station.license === 'challenge' ? (this.challengeClient ?? this.client) : this.client;
@@ -137,13 +146,47 @@ export class TokyoJihatsuService {
       resolveLabel: (id) => this.stationNames.get(id),
     });
 
+    // 遅延が取れる路線なら、発車ごとに重ねる。取れなくても時刻表どおりに出す。
+    let delayGeneratedAt: Date | null = null;
+    if (options.withDelay !== false) {
+      const index = await this.delayIndex(station, client).catch(() => null);
+      if (index) {
+        for (const departure of departures) {
+          const seconds = delayFor(index, departure.trainNumber, now);
+          if (seconds !== null && seconds > 0) {
+            departure.delaySeconds = seconds;
+            departure.at = new Date(departure.at.getTime() + seconds * 1000);
+          }
+        }
+        if (index.byTrainNumber.size > 0) delayGeneratedAt = index.generatedAt;
+      }
+    }
+
     return {
       station,
       direction,
       departures,
       calendarReason,
       empty: departures.length === 0,
+      delayGeneratedAt,
     };
+  }
+
+  /**
+   * 路線の遅延索引。
+   *
+   * 列車位置は 30 秒ごとに更新され、`dct:valid` は 5 分。
+   * それより短い間隔で引いても意味がないので、取得から 30 秒は使い回す。
+   */
+  private async delayIndex(station: MasterStation, client: OdptClient): Promise<DelayIndex | null> {
+    const railway = station.railway;
+    const cached = this.delayCache.get(railway);
+    if (cached && Date.now() - cached.fetchedAt < 30_000) return cached.index;
+
+    const trains = await client.trainsByRailway(railway);
+    const index = buildDelayIndex(trains);
+    this.delayCache.set(railway, { index, fetchedAt: Date.now() });
+    return index;
   }
 
   private async loadTimetables(

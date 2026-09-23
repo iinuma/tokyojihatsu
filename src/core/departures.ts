@@ -25,6 +25,11 @@ export interface Departure {
   /** この発車が属するサービス日。 */
   serviceDate: string;
   calendar: CalendarId;
+  /**
+   * 公表されている遅延（秒）。0 は定刻、undefined は遅延情報が無い路線。
+   * `at` にはこの遅延が加算済み。
+   */
+  delaySeconds?: number;
 }
 
 export interface DepartureLookupOptions {

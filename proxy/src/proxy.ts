@@ -32,6 +32,9 @@ const ALLOWED_DATA_TYPES = new Set([
   'odpt:Railway',
   'odpt:RailDirection',
   'odpt:TrainType',
+  // 列車の現在位置と、列車ごとの時刻表。位置は数分で古くなる。
+  'odpt:Train',
+  'odpt:TrainTimetable',
 ]);
 
 /** 転送してよいクエリ。`acl:consumerKey` は受け取らず、こちらで付ける。 */
@@ -41,6 +44,7 @@ const ALLOWED_PARAMS = new Set([
   'odpt:railway',
   'odpt:railDirection',
   'odpt:calendar',
+  'odpt:trainNumber',
   'owl:sameAs',
 ]);
 
@@ -55,6 +59,13 @@ const CACHE_SECONDS: Record<string, number> = {
   'odpt:RailDirection': 86_400,
   'odpt:TrainType': 86_400,
   'odpt:StationTimetable': 3_600,
+  'odpt:TrainTimetable': 3_600,
+  /**
+   * 列車の現在位置。`dct:valid` が 5 分なので、それより短く持つ。
+   * 開発者ガイドライン 2.1 は「最新でなくなった情報を表示しない」ことを
+   * 求めており、キャッシュで古い位置を配り続けるのは違反になる。
+   */
+  'odpt:Train': 30,
 };
 
 export interface ProxyRequest {

@@ -112,6 +112,8 @@ let selectedGroup: StationGroup | null = null;
 let directionOptions: DirectionOption[] = [];
 let selection: { station: MasterStation; direction: DirectionOption['direction'] } | null = null;
 let departures: Departure[] = [];
+/** 遅延情報が作られた時刻。使うなら画面に出す義務がある。 */
+let delayGeneratedAt: Date | null = null;
 let lastRemainingText = '';
 
 /** 時刻表の引き直しが進行中か。tick が重なって二重に走るのを防ぐ。 */
@@ -274,6 +276,7 @@ function currentPage(): PageContainers {
       return countdownPage(
         countdownTexts(selection.station, selection.direction, departures, Date.now(), {
           stale: refreshFailures >= FAILURES_BEFORE_NOTICE,
+          delayGeneratedAt,
         }),
       );
     }
@@ -318,6 +321,7 @@ async function updateRemaining(): Promise<void> {
   const hidden = peekEnabled && !peek.isUp;
   const texts = countdownTexts(selection.station, selection.direction, departures, Date.now(), {
     stale: refreshFailures >= FAILURES_BEFORE_NOTICE,
+    delayGeneratedAt,
   });
 
   // 時計は秒が動くので毎回変わる。差分判定は残り時間側で行う。
@@ -439,6 +443,7 @@ async function showCountdown(
   try {
     const snapshot = await service.countdown(station, direction, { count: 3 });
     departures = snapshot.departures;
+    delayGeneratedAt = snapshot.delayGeneratedAt;
   } catch (error) {
     console.warn('countdown failed', error);
     lastError = describeError(error);
@@ -499,6 +504,7 @@ async function refreshDepartures(): Promise<void> {
   try {
     const snapshot = await service.countdown(selection.station, selection.direction, { count: 3 });
     departures = snapshot.departures;
+    delayGeneratedAt = snapshot.delayGeneratedAt;
     refreshFailures = 0;
     lastRemainingText = '';
   } catch (error) {

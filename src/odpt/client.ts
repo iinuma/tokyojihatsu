@@ -3,6 +3,8 @@ import type {
   OdptRailway,
   OdptStation,
   OdptStationTimetable,
+  OdptTrain,
+  OdptTrainTimetable,
   OdptTrainType,
 } from './types.js';
 
@@ -107,6 +109,27 @@ export class OdptClient {
   stationTimetablesByOperator(operator: string): Promise<OdptStationTimetable[]> {
     return this.get<OdptStationTimetable>('odpt:StationTimetable', {
       'odpt:operator': operator,
+    });
+  }
+
+  /**
+   * 路線を走っている列車の現在位置。
+   * 数分で古くなるので、実行時に都度引く。
+   */
+  trainsByRailway(railway: string): Promise<OdptTrain[]> {
+    return this.get<OdptTrain>('odpt:Train', { 'odpt:railway': railway });
+  }
+
+  /** 路線の列車時刻表。列車番号で位置と突き合わせる。 */
+  trainTimetablesByRailway(railway: string): Promise<OdptTrainTimetable[]> {
+    return this.get<OdptTrainTimetable>('odpt:TrainTimetable', { 'odpt:railway': railway });
+  }
+
+  /** 列車番号を指定して時刻表を引く。 */
+  trainTimetablesByNumber(railway: string, trainNumber: string): Promise<OdptTrainTimetable[]> {
+    return this.get<OdptTrainTimetable>('odpt:TrainTimetable', {
+      'odpt:railway': railway,
+      'odpt:trainNumber': trainNumber,
     });
   }
 

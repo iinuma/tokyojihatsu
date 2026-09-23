@@ -355,3 +355,42 @@ describe('チャレンジ限定データの振り分け', () => {
     assert.equal(calls.length, 0);
   });
 });
+
+describe('列車位置と列車時刻表', () => {
+  it('どちらも中継してよいデータ型に含む', async () => {
+    for (const dataType of ['odpt:Train', 'odpt:TrainTimetable']) {
+      const { fetchImpl } = upstream();
+      const response = await handleProxyRequest(
+        { path: `/${dataType}`, query: {}, method: 'GET' },
+        { token: TOKEN, fetchImpl },
+      );
+      assert.equal(response.status, 200, dataType);
+    }
+  });
+
+  it('列車位置は短くキャッシュする', async () => {
+    // dct:valid が 5 分。古い位置を配り続けると
+    // 「最新でなくなった情報を表示しない」に反する
+    const { fetchImpl } = upstream();
+    const train = await handleProxyRequest(
+      { path: '/odpt:Train', query: {}, method: 'GET' },
+      { token: TOKEN, fetchImpl },
+    );
+    assert.equal(train.headers['Cache-Control'], 'public, max-age=30');
+
+    const timetable = await handleProxyRequest(
+      { path: '/odpt:TrainTimetable', query: {}, method: 'GET' },
+      { token: TOKEN, fetchImpl },
+    );
+    assert.equal(timetable.headers['Cache-Control'], 'public, max-age=3600');
+  });
+
+  it('列車番号での絞り込みを通す', async () => {
+    const { calls, fetchImpl } = upstream();
+    await handleProxyRequest(
+      { path: '/odpt:TrainTimetable', query: { 'odpt:trainNumber': '601A' }, method: 'GET' },
+      { token: TOKEN, fetchImpl },
+    );
+    assert.equal(new URL(calls[0]!).searchParams.get('odpt:trainNumber'), '601A');
+  });
+});
