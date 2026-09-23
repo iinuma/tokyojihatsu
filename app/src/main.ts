@@ -332,12 +332,14 @@ async function updateRemaining(): Promise<void> {
   syncDom(currentPage());
   if (!bridge) return;
 
-  // 時計だけは毎秒書き換える。
+  // 時計は伏せない。
+  // 見上げ表示で消したいのは「駅と次発」であって、時刻そのものではない。
+  // 時計だけ残しておけば、駅から離れていても作業時間の目安に使える。
   await bridge.textContainerUpgrade(
     new TextContainerUpgrade({
       containerID: COUNTDOWN.clock.id,
       containerName: COUNTDOWN.clock.name,
-      content: hidden ? ' ' : texts.clock,
+      content: texts.clock,
     }),
   );
 
