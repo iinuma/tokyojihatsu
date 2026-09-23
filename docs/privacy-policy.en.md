@@ -39,9 +39,17 @@ sent.**
 
 ## Data stored on your device
 
-The most recently selected station and direction are stored on your device so the
-app can resume immediately next time. This never leaves your device and is
-removed when you uninstall the app.
+Two things are stored on your device. **Neither ever leaves it.** Both are removed
+when you uninstall the app.
+
+- The most recently selected station and direction, so the app can resume
+  immediately next time
+- **The coordinates recorded at that moment**, used only to decide whether the
+  previous station is still the sensible choice when you start the app in the
+  same place
+
+The coordinates are used for that decision on the device alone. They are never
+transmitted or logged.
 
 ## Relay server logs
 
