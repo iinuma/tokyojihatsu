@@ -17,6 +17,25 @@ Even Hub の審査では `supported_languages` ごとに必要。1〜3 行、コ
 できないため、数字を書くと実態とずれたまま直せなくなる。「首都圏」なら
 期限の前後どちらでも成り立つ。
 
+## 0.4.2
+
+### ja
+
+```
+列車の遅延情報に対応しました。遅れているときは発車時刻の横に「(2分遅れ)」と出ます。
+見上げ表示にしているときも、時計は表示したままにしました。
+```
+
+### en
+
+```
+Now reflects published train delays; a delayed departure shows the delay beside its time.
+The clock stays visible even while the rest of the display is hidden.
+```
+
+遅延は東京メトロなど一部の事業者では取得できない。その路線では従来どおり
+時刻表だけで動くので、リリースノートでは事業者を限定せずに書いている。
+
 ## 0.2.0
 
 ### ja
