@@ -130,7 +130,7 @@ describe('データについての画面', () => {
     assert.match(text, /公共交通オープンデータセンター/);
     assert.match(text, /保証されていません/);
     // 遅延を反映しない旨はカウントダウン画面から外してこちらに置いた
-    assert.match(text, /遅延は反映されません/);
+    assert.match(text, /遅延情報が/);
     assert.match(text, /dev@example.com/);
     assert.match(text, /2026-05-28/);
   });

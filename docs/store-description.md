@@ -12,8 +12,11 @@
 
 一度選べば記憶するので、同じ駅では起動するだけでカウントダウンが始まります。駅を変えたいときはメニューから選び直せます。
 
+■ 遅れているとき
+遅延情報が提供されている路線では、発車時刻の横に遅れを表示します。東京メトロなど遅延情報を提供していない事業者の路線では表示されません。
+
 ■ 見上げたときだけ表示
-初期設定では、視線を下げると表示が消え、見上げると戻ります。歩いているときや人と話しているときに視界を占有しません。常時表示に切り替えることもできます。
+初期設定では、視線を下げると駅名とカウントダウンが消え、見上げると戻ります。歩いているときや人と話しているときに視界を占有しません。時計は常に表示したままです。常時表示に切り替えることもできます。
 
 ■ 対応範囲
 首都圏の鉄道に対応しています。
@@ -25,7 +28,7 @@
 現在地から近い駅を候補に出すため、位置情報を利用します。位置情報はお使いのスマートフォンの中だけで処理され、外部に送信されることはありません。
 
 ■ データについて
-本アプリの時刻表データは公共交通オープンデータセンターの提供です。データの正確性・完全性が保証されたものではありません。表示は時刻表上の予定時刻であり、遅延は反映されません。
+本アプリの時刻表データと遅延情報は公共交通オープンデータセンターの提供です。データの正確性・完全性が保証されたものではありません。表示は時刻表上の予定時刻で、遅延情報が提供されている路線ではそれを加えて表示します。遅延情報を提供していない事業者の路線では、時刻表上の予定時刻のみを表示します。
 
 本アプリが表示する情報について、公共交通事業者への直接のお問い合わせはご遠慮ください。下記までご連絡ください。
 
@@ -36,7 +39,7 @@
 
 Tokyojihatsu shows a countdown to the next train on your Even G2, so you don't have to take out your phone. Pick a nearby station and direction, and the remaining time appears on the glasses. By default the display hides when you look down and returns when you look up.
 
-Covers railways in the Tokyo area. Timetable data is provided by the Open Data Center for Public Transportation. Accuracy and completeness are not guaranteed; times shown are scheduled departures and do not reflect delays. Please do not contact transit operators about this app.
+Covers railways in the Tokyo area. Timetable and delay data is provided by the Open Data Center for Public Transportation. Accuracy and completeness are not guaranteed; times shown are scheduled departures, with published delays added where an operator provides them. Please do not contact transit operators about this app.
 
 Contact: async.sync+tokyojihatsu@gmail.com
 ```

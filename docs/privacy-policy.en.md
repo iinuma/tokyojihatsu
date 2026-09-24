@@ -64,9 +64,11 @@ app shows no advertising and uses no analytics.
 
 ## About the timetable data
 
-Timetables shown by this app are provided by the Open Data Center for Public
-Transportation. Their accuracy and completeness are not guaranteed. Times shown
-are scheduled departure times; delays are not reflected.
+Timetables and delay information shown by this app are provided by the Open Data
+Center for Public Transportation. Their accuracy and completeness are not
+guaranteed. Times shown are scheduled departure times; where an operator
+publishes delay information, that delay is added. For operators that do not
+publish it, only the scheduled time is shown.
 
 Please do not contact transit operators directly about information shown in this
 app. Use the contact address below instead.
