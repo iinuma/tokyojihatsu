@@ -9,6 +9,11 @@
  * 焼ける。版は「ビルドの単位」ではなく「アップロードの単位」で、提出すると
  * 決めたときにだけ 1 つ上げる。0.4.0〜0.4.2 が欠番になったのは、検証のたびに
  * 版を上げていたからだった。
+ *
+ * スクリーンショットも同じ理由でここで見る。**審査中は Store listing を
+ * 編集できない**ので、画像が古いまま提出すると、審査が終わるまで直せない。
+ * 0.4.3 では About の文言を直したのに画像は 2 版ぶん古いままで、ストアの
+ * 画像がアプリの実装と矛盾したまま公開されていた。
  */
 
 import { execFileSync } from 'node:child_process';
@@ -107,6 +112,42 @@ function readNotes(version: string, languages: string[]): Map<string, string> {
   return found;
 }
 
+/** そのパスに最後に触れたコミットの日時（UNIX 秒）。無ければ 0。 */
+function lastCommitAt(path: string): number {
+  try {
+    const out = git('log', '-1', '--format=%ct', '--', path);
+    return out.length > 0 ? Number(out) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * 画面を変えたのにスクリーンショットを撮り直していないと、古い画像のまま
+ * 提出することになる。**審査中は Store listing を編集できない**ので、
+ * 気づいても審査が終わるまで直せない。
+ *
+ * app/src のほうが assets/screenshots より新しければ止める。文言に関係ない
+ * 変更でも引っかかるが、提出は頻繁ではないので、空振りより見逃しを嫌う。
+ */
+function checkScreenshots(): void {
+  const code = lastCommitAt('app/src');
+  const shots = lastCommitAt('assets/screenshots');
+
+  if (code === 0 || shots === 0) return;
+  if (shots >= code) {
+    console.log('  ✓ スクリーンショットはコードより新しい');
+    return;
+  }
+
+  const days = Math.round((code - shots) / 86400);
+  fail(
+    `スクリーンショットがコードより古いままです（${days} 日ぶん）。`,
+    '審査中は Store listing を編集できない。撮り方は assets/screenshots/README.md。\n' +
+      '    画面に影響しない変更なら SKIP_SCREENSHOT_CHECK=1 で通せる。',
+  );
+}
+
 function main(): void {
   const manifest: Manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
   const { version, name, supported_languages: languages } = manifest;
@@ -134,6 +175,12 @@ function main(): void {
       '未コミットの変更があります。',
       'どのコミットが提出物かを後から辿れるよう、先にコミットしてください。',
     );
+  }
+
+  if (process.env.SKIP_SCREENSHOT_CHECK === '1') {
+    console.log('  ! スクリーンショット検査をとばしています');
+  } else {
+    checkScreenshots();
   }
 
   const notes = readNotes(version, languages);
