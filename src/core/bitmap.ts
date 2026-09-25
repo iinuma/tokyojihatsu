@@ -172,6 +172,33 @@ export class Bitmap {
     return out;
   }
 
+  /**
+   * 8bit グレースケールの画素列から作る。
+   *
+   * 実機では canvas の getImageData がこの形で取れる。地図タイルを
+   * WebView で描いてから読み出す経路がそのまま使えるので、PNG デコーダを
+   * 自前で持つ必要がない。
+   *
+   * `maxLevel` を下げると全体が暗くなる。地図を下敷きにして、その上へ
+   * 現在地や駅の印を明るく乗せたいときに使う。
+   */
+  static fromGray8(
+    gray: Uint8Array | number[],
+    width: number,
+    height: number,
+    maxLevel = 15,
+  ): Bitmap {
+    if (gray.length < width * height) {
+      throw new Error(`gray8 too short: ${gray.length} < ${width * height}`);
+    }
+    const bitmap = new Bitmap(width, height);
+    const limit = Math.max(0, Math.min(15, Math.round(maxLevel)));
+    for (let i = 0; i < width * height; i += 1) {
+      bitmap.pixels[i] = Math.round(((gray[i] ?? 0) / 255) * limit);
+    }
+    return bitmap;
+  }
+
   /** SDK は number[] を推奨している（宿主 Dart の List<int> が受けやすい）。 */
   toNumberArray(packed: boolean): number[] {
     return Array.from(packed ? this.toGray4Packed() : this.toGray8());

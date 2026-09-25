@@ -58,6 +58,26 @@ describe('Bitmap', () => {
     assert.equal(bitmap.toGray4Packed().length, 20736);
   });
 
+  it('fromGray8 は 8bit グレーを 16 階調に落とす', () => {
+    // 実機では canvas の getImageData がこの形で取れる。
+    const gray = new Uint8Array([0, 255, 128]);
+    const bitmap = Bitmap.fromGray8(gray, 3, 1);
+    assert.equal(bitmap.get(0, 0), 0);
+    assert.equal(bitmap.get(1, 0), 15);
+    assert.equal(bitmap.get(2, 0), 8);
+  });
+
+  it('fromGray8 の maxLevel で下敷きとして暗くできる', () => {
+    // 地図を下敷きにして、その上へ印を最大の明るさで乗せるため。
+    const gray = new Uint8Array([255, 255]);
+    const bitmap = Bitmap.fromGray8(gray, 2, 1, 7);
+    assert.equal(bitmap.get(0, 0), 7, '最大でも 7 に収まる');
+  });
+
+  it('fromGray8 は画素が足りなければ落とす', () => {
+    assert.throws(() => Bitmap.fromGray8(new Uint8Array(5), 10, 10), /too short/);
+  });
+
   it('ring は輪郭だけで、中心は塗らない', () => {
     const bitmap = new Bitmap(21, 21);
     bitmap.ring(10, 10, 5, LEVEL.bright);
