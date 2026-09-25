@@ -1,0 +1,22 @@
+{
+  "package_id": "com.masahiroiinuma.tokyojihatsumapprobe",
+  "edition": "202601",
+  "name": "Tokyojihatsu Map",
+  "version": "0.1.0",
+  "min_sdk_version": "0.0.15",
+  "entrypoint": "index.html",
+  "permissions": [
+    {
+      "name": "location",
+      "desc": "現在地を中心にした地図を描くために使います。転送時間と見え方を実機で測るための検証用プラグインです。"
+    },
+    {
+      "name": "network",
+      "desc": "国土地理院の地理院タイルを取得して地図を描きます。",
+      "whitelist": [
+        "https://cyberjapandata.gsi.go.jp"
+      ]
+    }
+  ],
+  "supported_languages": ["ja", "en"]
+}

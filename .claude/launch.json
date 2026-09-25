@@ -18,6 +18,15 @@
         "probe:dev"
       ],
       "port": 5173
+    },
+    {
+      "name": "mapprobe",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "mapprobe:dev"
+      ],
+      "port": 5176
     }
   ]
 }

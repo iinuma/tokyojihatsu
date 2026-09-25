@@ -17,7 +17,11 @@
     "app:build": "vite build --config app/vite.config.ts",
     "app:pack": "npm run app:build && evenhub pack app/app.json dist/app -o dist/tokyojihatsu.ehpk --sdk-ver 0.0.15",
     "app:qr": "evenhub qr --url \"http://$(./scripts/lan-ip.sh):5175\"",
-    "app:release": "tsx scripts/release.ts"
+    "app:release": "tsx scripts/release.ts",
+    "mapprobe:dev": "LAN_IP=$(./scripts/lan-ip.sh) vite --config mapprobe/vite.config.ts",
+    "mapprobe:build": "vite build --config mapprobe/vite.config.ts",
+    "mapprobe:pack": "npm run mapprobe:build && evenhub pack mapprobe/app.json dist/mapprobe -o dist/tokyojihatsu-mapprobe.ehpk --sdk-ver 0.0.15",
+    "mapprobe:qr": "evenhub qr --url \"http://$(./scripts/lan-ip.sh):5176\""
   },
   "devDependencies": {
     "@aws-sdk/client-ssm": "^3.1136.0",

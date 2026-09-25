@@ -1,15 +1,13 @@
 /**
- * 地理院タイルを下敷きにした地図を試す。模式図との比較用。
+ * 地理院タイルを下敷きにした地図を、実機に入れる前に手元で見る。
  *
- * データ元は国土地理院の地理院タイル。リアルタイムに読み込んで表示する限り
- * **申請不要・出典の明示のみ**で使える（加工する場合はその旨も明記する）。
- * 鍵も要らず、日本全国が揃っているので、このアプリの対応範囲とちょうど合う。
+ * **減色と重ね合わせは src/core の実装をそのまま呼ぶ**。ここで別の処理を
+ * 書くと、手元で見たものと実機に出るものが違ってしまう。ImageMagick は
+ * タイルの連結・切り出しと、結果を PNG にする表示のためだけに使う
+ * （実機ではどちらも canvas が受け持つ）。
  *
- *   https://maps.gsi.go.jp/development/ichiran.html
- *
- * 実機では、タイルの取得と減色は WebView の canvas でできる（getImageData が
- * 8bit グレーで取れる）。PNG デコーダを自前で持つ必要はない。
- * ここでは手元で見るために ImageMagick を使っている。
+ * データ元は国土地理院の地理院タイル。地理院サーバーからリアルタイムに
+ * 読み込んで表示する限り、申請不要・出典の明示のみで使える。
  *
  *   npx tsx scripts/preview-tilemap.ts 35.5376 139.7420
  */
@@ -20,111 +18,76 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { Bitmap, LEVEL, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT } from '../src/core/bitmap.js';
-import { nearest, distanceMeters, type LatLng } from '../src/core/geo.js';
+import { nearest, type LatLng } from '../src/core/geo.js';
 import { groupStations, usableStations, type StationMaster } from '../src/core/master.js';
+import {
+  GSI_ATTRIBUTION,
+  gsiTileUrl,
+  metersPerPixel,
+  tileWindow,
+  toWindowPixel,
+  TILE_SIZE,
+  type TileWindow,
+} from '../src/core/mercator.js';
+import { tileToInk } from '../src/core/tileink.js';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const OUT_DIR = resolve(ROOT, 'dist/preview');
-const WORK = resolve(ROOT, 'dist/preview/.tiles');
+const WORK = resolve(OUT_DIR, '.tiles');
 
-const TILE = 256;
 const WIDTH = MAX_IMAGE_WIDTH;
 const HEIGHT = MAX_IMAGE_HEIGHT;
 
-/** z13 で約 15.5 m/画素。288px に約 4.5km 入り、徒歩圏の 2km 半径とちょうど合う。 */
+/** z13 で約 15.5 m/画素。288px に約 4.5km 入り、徒歩圏 2km 半径と合う。 */
 const ZOOM = 13;
 const STYLE = 'pale';
 
 /** 地図は下敷きなので暗くする。印を最大 15 で乗せたとき埋もれないように。 */
 const BASEMAP_MAX_LEVEL = 7;
 
-interface Window {
-  originPx: number;
-  originPy: number;
-  left: number;
-  top: number;
-}
-
-function pixelXY(point: LatLng, zoom: number): { px: number; py: number } {
-  const n = 2 ** zoom * TILE;
-  const latRad = (point.lat * Math.PI) / 180;
-  return {
-    px: ((point.lng + 180) / 360) * n,
-    py: ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n,
-  };
-}
-
-async function fetchWindow(origin: LatLng, zoom: number): Promise<Window> {
-  const { px, py } = pixelXY(origin, zoom);
-  const left = px - WIDTH / 2;
-  const top = py - HEIGHT / 2;
-
-  const tx0 = Math.floor(left / TILE);
-  const ty0 = Math.floor(top / TILE);
-  const tx1 = Math.floor((left + WIDTH) / TILE);
-  const ty1 = Math.floor((top + HEIGHT) / TILE);
-
+/** タイルを取得して連結し、窓を切り出して RGBA で返す。実機では canvas の仕事。 */
+async function fetchWindowRgba(window: TileWindow): Promise<Uint8ClampedArray> {
   rmSync(WORK, { recursive: true, force: true });
   mkdirSync(WORK, { recursive: true });
 
-  const rowFiles: string[] = [];
-  for (let ty = ty0; ty <= ty1; ty += 1) {
-    const cols: string[] = [];
-    for (let tx = tx0; tx <= tx1; tx += 1) {
-      const url = `https://cyberjapandata.gsi.go.jp/xyz/${STYLE}/${zoom}/${tx}/${ty}.png`;
-      const response = await fetch(url);
-      const file = resolve(WORK, `t-${tx}-${ty}.png`);
-      if (response.ok) {
-        writeFileSync(file, Buffer.from(await response.arrayBuffer()));
-      } else {
-        // 海上や範囲外は 404。白タイルで埋める。
-        execFileSync('magick', ['-size', `${TILE}x${TILE}`, 'xc:white', file]);
-      }
-      cols.push(file);
+  const files: string[] = [];
+  for (const tile of window.tiles) {
+    const file = resolve(WORK, `t-${tile.x}-${tile.y}.png`);
+    const response = await fetch(gsiTileUrl(tile, STYLE));
+    if (response.ok) {
+      writeFileSync(file, Buffer.from(await response.arrayBuffer()));
+    } else {
+      // 海上や範囲外は 404 が返る。白（＝紙）で埋めれば、反転後に透明になる。
+      execFileSync('magick', ['-size', `${TILE_SIZE}x${TILE_SIZE}`, 'xc:white', file]);
     }
-    const rowFile = resolve(WORK, `row-${ty}.png`);
+    files.push(file);
+  }
+
+  // tiles は行優先で並んでいるので、columns ごとに横へ繋いでから縦に積む。
+  const rowFiles: string[] = [];
+  for (let row = 0; row < window.rows; row += 1) {
+    const cols = files.slice(row * window.columns, (row + 1) * window.columns);
+    const rowFile = resolve(WORK, `row-${row}.png`);
     execFileSync('magick', [...cols, '+append', rowFile]);
     rowFiles.push(rowFile);
   }
 
-  execFileSync('magick', [...rowFiles, '-append', resolve(WORK, 'joined.png')]);
+  const rgbaFile = resolve(WORK, 'win.rgba');
   execFileSync('magick', [
-    resolve(WORK, 'joined.png'),
-    '-crop',
-    `${WIDTH}x${HEIGHT}+${Math.round(left - tx0 * TILE)}+${Math.round(top - ty0 * TILE)}`,
+    ...rowFiles,
+    '-append',
+    '-crop', `${WIDTH}x${HEIGHT}+${window.offsetX}+${window.offsetY}`,
     '+repage',
-    resolve(WORK, 'win.png'),
+    '-depth', '8',
+    `rgba:${rgbaFile}`,
   ]);
 
-  return { originPx: px, originPy: py, left, top };
-}
-
-/**
- * 透過ディスプレイ向けの減色。
- *
- * 紙の地図は白地に黒インクだが、G2 は明るい＝光る・暗い＝透明なので、
- * **そのまま出すとインクが消えて紙だけが光る**。必ず反転する。
- */
-function toGray(variant: 'edge' | 'ink'): Uint8Array {
-  const source = resolve(WORK, 'win.png');
-  const out = resolve(WORK, `${variant}.gray`);
-
-  const args =
-    variant === 'edge'
-      ? [source, '-colorspace', 'Gray',
-         '-define', 'convolve:scale=!', '-define', 'morphology:compose=Lighten',
-         '-morphology', 'Convolve', 'Sobel:>', '-normalize']
-      : [source, '-colorspace', 'Gray', '-negate', '-level', '10%,45%',
-         '-morphology', 'Dilate', 'Diamond:1'];
-
-  execFileSync('magick', [...args, '-depth', '8', `gray:${out}`]);
-  return new Uint8Array(readFileSync(out));
+  return new Uint8ClampedArray(readFileSync(rgbaFile));
 }
 
 function writePng(bitmap: Bitmap, path: string, zoom: number): void {
   const raw = resolve(WORK, 'out.gray');
-  const scaled = bitmap.toGray8();
-  writeFileSync(raw, Buffer.from(scaled));
+  writeFileSync(raw, Buffer.from(bitmap.toGray8()));
   execFileSync('magick', [
     '-size', `${bitmap.width}x${bitmap.height}`, '-depth', '8', `gray:${raw}`,
     '-fill', '#00ff44', '-tint', '100',
@@ -142,59 +105,50 @@ async function main(): Promise<void> {
   const master: StationMaster = JSON.parse(
     readFileSync(resolve(ROOT, 'data/stations.json'), 'utf8'),
   );
-  const groups = groupStations(usableStations(master));
-  const near = nearest(origin, groups, { limit: 12, maxDistanceMeters: 2000 });
+  const near = nearest(origin, groupStations(usableStations(master)), {
+    limit: 12,
+    maxDistanceMeters: 2000,
+  });
 
-  console.log(`\n  地理院タイル（${STYLE} z${ZOOM}）を取得中…`);
-  const window = await fetchWindow(origin, ZOOM);
+  const window = tileWindow(origin, ZOOM, WIDTH, HEIGHT);
+  console.log(`\n  地理院タイル ${STYLE} z${ZOOM} を ${window.tiles.length} 枚取得中…`);
 
-  const metersPerPixel = (156543.03392 * Math.cos((origin.lat * Math.PI) / 180)) / 2 ** ZOOM;
-  mkdirSync(OUT_DIR, { recursive: true });
+  const rgba = await fetchWindowRgba(window);
+  const ink = tileToInk(rgba, WIDTH, HEIGHT);
+  const bitmap = Bitmap.fromGray8(ink, WIDTH, HEIGHT, BASEMAP_MAX_LEVEL);
 
-  const toScreen = (point: LatLng): { x: number; y: number } => {
-    const { px, py } = pixelXY(point, ZOOM);
-    return { x: px - window.left, y: py - window.top };
-  };
-
-  for (const variant of ['ink', 'edge'] as const) {
-    const gray = toGray(variant);
-    const bitmap = Bitmap.fromGray8(gray, WIDTH, HEIGHT, BASEMAP_MAX_LEVEL);
-
-    // 下敷きの上に印を重ねる。地図があるので半径の圧縮はしない
-    // （圧縮すると印と地図がずれて、地図である意味が消える）。
-    for (const { item } of near) {
-      const at = toScreen(item);
-      bitmap.disc(at.x, at.y, 2, LEVEL.bright);
-      bitmap.ring(at.x, at.y, 4, LEVEL.mid);
-    }
-
-    const selected = near[0];
-    if (selected) {
-      const at = toScreen(selected.item);
-      bitmap.ring(at.x, at.y, 7, LEVEL.bright);
-      bitmap.ring(at.x, at.y, 8, LEVEL.bright);
-    }
-
-    const here = toScreen(origin);
-    bitmap.cross(here.x, here.y, 8, LEVEL.bright);
-    bitmap.set(here.x, here.y, LEVEL.off);
-
-    const packed = bitmap.toGray4Packed();
-    const compressed = deflateSync(packed, { level: 9 }).length;
-
-    writePng(bitmap, resolve(OUT_DIR, `tilemap-${variant}-x1.png`), 1);
-    writePng(bitmap, resolve(OUT_DIR, `tilemap-${variant}-x3.png`), 3);
-
-    console.log(
-      `  ${variant.padEnd(5)} Gray4 ${packed.length} → deflate ${compressed} bytes ` +
-        `(${(packed.length / compressed).toFixed(1)}:1)`,
-    );
+  // 下敷きの上に印を重ねる。地図があるので半径は圧縮しない
+  // （圧縮すると印と地図がずれ、地図である意味が消える）。
+  for (const { item } of near) {
+    const at = toWindowPixel(item, window);
+    bitmap.disc(at.x, at.y, 2, LEVEL.bright);
+    bitmap.ring(at.x, at.y, 4, LEVEL.mid);
   }
 
-  console.log(`\n  縮尺 ${metersPerPixel.toFixed(1)} m/画素  範囲 ${(WIDTH * metersPerPixel / 1000).toFixed(1)}km × ${(HEIGHT * metersPerPixel / 1000).toFixed(1)}km`);
+  const selected = near[0];
+  if (selected) {
+    const at = toWindowPixel(selected.item, window);
+    bitmap.ring(at.x, at.y, 7, LEVEL.bright);
+    bitmap.ring(at.x, at.y, 8, LEVEL.bright);
+  }
+
+  const here = toWindowPixel(origin, window);
+  bitmap.cross(here.x, here.y, 8, LEVEL.bright);
+  bitmap.set(here.x, here.y, LEVEL.off);
+
+  mkdirSync(OUT_DIR, { recursive: true });
+  writePng(bitmap, resolve(OUT_DIR, 'tilemap-x1.png'), 1);
+  writePng(bitmap, resolve(OUT_DIR, 'tilemap-x3.png'), 3);
+
+  const packed = bitmap.toGray4Packed();
+  const compressed = deflateSync(packed, { level: 9 }).length;
+  const scale = metersPerPixel(origin.lat, ZOOM);
+
+  console.log(`  Gray4 ${packed.length} → deflate ${compressed} bytes (${(packed.length / compressed).toFixed(1)}:1)`);
+  console.log(`\n  縮尺 ${scale.toFixed(1)} m/画素  範囲 ${((WIDTH * scale) / 1000).toFixed(1)}km × ${((HEIGHT * scale) / 1000).toFixed(1)}km`);
   console.log(`  近傍 ${near.length} 駅: ${near.slice(0, 5).map((n) => n.item.name).join('・')}…`);
-  console.log(`\n  出典: 国土地理院（地理院タイルを加工して使用）`);
-  console.log(`  → ${OUT_DIR}/tilemap-*.png\n`);
+  console.log(`\n  ${GSI_ATTRIBUTION}`);
+  console.log(`  → ${OUT_DIR}/tilemap-x1.png / -x3.png\n`);
 }
 
 main();
