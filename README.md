@@ -126,10 +126,23 @@ contents」）。個人利用なら ODPT を直接叩けるが、Even Hub 公開
 ## カウントダウン本体
 
 ```bash
-npm run app:dev     # dev サーバー（:5174）
+npm run app:dev     # dev サーバー（:5175）
 npm run app:qr      # 実機に読ませる QR
-npm run app:pack    # dist/tokyojihatsu.ehpk（約 72KB）
+npm run app:pack    # 検証用。版を上げずに何度でも焼ける
+npm run app:release # 提出用。ノートが揃っていなければ止まる
 ```
+
+**版はビルドの単位ではなく、アップロードの単位**。実機検証のために
+`app.json` の `version` を上げる必要はない。上げるのは提出すると決めたときだけで、
+`app:release` がその前に次を確かめる。
+
+- `docs/release-notes.md` に、その版の節が `supported_languages` 全部ぶんあるか
+- `v<version>` のタグがまだ無いか（あれば上げ済み）
+- 作業ツリーがクリーンか
+
+通れば `.ehpk` を作り、**Add build に貼り付ける文面をそのまま出力する**。
+Even Hub はアップロードの瞬間にしかノートを書けず、あとから直せないので、
+あの画面で文章を考えないための仕掛け。
 
 画面は 3 つ。近くの駅を選び、方面を選ぶとカウントダウンに入る。前回の選択を覚えていて、
 同じ駅の 500m 以内にいれば起動してすぐカウントダウンになる。
