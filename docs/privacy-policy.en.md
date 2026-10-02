@@ -1,6 +1,6 @@
 # Tokyojihatsu Privacy Policy
 
-Last updated: 2026-09-21
+Last updated: 2026-10-03
 
 Tokyojihatsu is an app for Even Realities G2 that shows how long remains until the
 next train, based on published station timetables. This policy explains what the
@@ -22,6 +22,19 @@ developer nor anyone else receives your location.
 
 If you deny location access, nearby stations cannot be listed automatically, but
 the rest of the app still works.
+
+### Motion sensor (IMU)
+
+**Purpose**: to support the look-up display, the app reads head tilt from the
+IMU (accelerometer) in the smart glasses. The readings are used only to decide,
+at that moment, whether you are looking up or down. **They are never stored or
+transmitted.**
+
+The sensor is enabled when the app starts and **always disabled when it exits**.
+If you switch to always-on display, the sensor remains enabled; only the
+look-up decision is skipped.
+
+It is never used to track movement, analyse posture, or infer activity.
 
 ### Network
 
