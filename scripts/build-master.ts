@@ -64,6 +64,12 @@ async function loadEnv(name: string): Promise<string> {
   return matches.at(-1)?.[1]?.trim() ?? '';
 }
 
+import {
+  buildRailwayOrder,
+  disambiguate,
+  type RailwayOrder,
+} from './lib/direction-label.js';
+
 function stationName(station: OdptStation): string {
   return station['odpt:stationTitle']?.ja ?? station['dc:title'] ?? station['owl:sameAs'];
 }
@@ -111,6 +117,8 @@ async function main(): Promise<void> {
   // 表示に使う辞書は取得元をまたいで共有する。直通先の駅名がここで埋まる。
   const stationNames = new Map<string, string>();
   const railwayTitles = new Map<string, string>();
+  /** 路線 ID → 駅の並びと方面の対応。方面ラベルが衝突したときに隣の駅を引く。 */
+  const railwayOrders = new Map<string, RailwayOrder>();
   const directionTitles = new Map<string, string>();
   const trainTypeTitles = new Map<string, string>();
   const usedDestinationIds = new Set<string>();
@@ -153,6 +161,7 @@ async function main(): Promise<void> {
           railway['owl:sameAs'],
           railway['odpt:railwayTitle']?.ja ?? railway['dc:title'] ?? railway['owl:sameAs'],
         );
+        railwayOrders.set(railway['owl:sameAs'], buildRailwayOrder(railway));
       }
 
       for (const trainType of await client.trainTypes(operator).catch(() => [])) {
@@ -288,6 +297,17 @@ async function main(): Promise<void> {
         timetables: accumulator.timetables,
       });
     }
+
+    // 環状線は両方向とも最頻行先が同じになり、ラベルが区別できなくなる
+    // （山手線の全 30 駅と大江戸線の都庁前で実際に起きていた）。
+    // 衝突したものだけ、その方向の隣の駅に差し替える。
+    const resolved = disambiguate(directions, {
+      order: railwayOrders.get(entry.station['odpt:railway'] ?? ''),
+      stationId,
+      nameOf: (id) => stationNames.get(id),
+    });
+    directions.length = 0;
+    directions.push(...resolved);
 
     directions.sort((a, b) => a.label.localeCompare(b.label, 'ja'));
 

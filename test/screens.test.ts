@@ -9,7 +9,13 @@ import {
   directionPickerPage,
   stationPickerPage,
 } from '../app/src/screens.js';
-import { truncateItem, visualWidth, padCenter, padToColumn } from '../app/src/layout.js';
+import {
+  truncateItem,
+  visualWidth,
+  padCenter,
+  padToColumn,
+  APPROX_COLUMNS,
+} from '../app/src/layout.js';
 import type { Departure } from '../src/core/departures.js';
 import type { MasterDirection, MasterStation } from '../src/core/master.js';
 
@@ -127,12 +133,48 @@ describe('カウントダウン画面', () => {
 describe('データについての画面', () => {
   it('ODPT ガイドラインで要る 3 点と取得日時を含む', () => {
     const text = aboutText('2026-05-28T15:00:00+09:00', 'dev@example.com');
-    assert.match(text, /公共交通オープンデータセンター/);
+    assert.match(text, /公共交通オープンデータ/);
     assert.match(text, /保証されていません/);
-    // 遅延を反映しない旨はカウントダウン画面から外してこちらに置いた
-    assert.match(text, /遅延情報が/);
+    // 遅延を反映する旨はカウントダウン画面から外してこちらに置いた
+    assert.match(text, /遅延情報/);
     assert.match(text, /dev@example.com/);
     assert.match(text, /2026-05-28/);
+  });
+
+  it('取得日時は秒とタイムゾーンを落として短く出す', () => {
+    // ISO のまま 25 桁出すと、他の必須表示を画面外へ押し出す。
+    const text = aboutText('2026-05-28T15:00:00+09:00', 'dev@example.com');
+    assert.match(text, /2026-05-28 15:00/);
+    assert.doesNotMatch(text, /T15:00:00/);
+  });
+
+  it('1 画面に収まる（9 行以下）', () => {
+    // スクロールしないと読めない位置に必須表示があるのは
+    // 「容易にアクセスできる画面上」とは言いにくい。実際に取得日時が
+    // 画面外へ出ていたことがある。
+    const text = aboutText('2026-09-24T08:00:00+09:00', 'async.sync+tokyojihatsu@gmail.com', {
+      challengeExpiresAt: '2027-03-12',
+    });
+    const lines = text.split('\n');
+    assert.ok(lines.length <= 9, `${lines.length} 行ある:\n${text}`);
+  });
+
+  it('どの行も画面幅に収まる', () => {
+    const text = aboutText('2026-09-24T08:00:00+09:00', 'async.sync+tokyojihatsu@gmail.com', {
+      challengeExpiresAt: '2027-03-12',
+    });
+    for (const line of text.split('\n')) {
+      assert.ok(
+        visualWidth(line) <= APPROX_COLUMNS,
+        `${visualWidth(line)} 桁で溢れる: ${line}`,
+      );
+    }
+  });
+
+  it('チャレンジ期限が無ければその 2 行は出ない', () => {
+    const text = aboutText('2026-09-24T08:00:00+09:00', 'dev@example.com');
+    assert.doesNotMatch(text, /チャレンジ限定/);
+    assert.ok(text.split('\n').length <= 7);
   });
 });
 

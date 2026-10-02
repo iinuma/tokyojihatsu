@@ -131,7 +131,9 @@ function lastCommitAt(path: string): number {
  * 変更でも引っかかるが、提出は頻繁ではないので、空振りより見逃しを嫌う。
  */
 function checkScreenshots(): void {
-  const code = lastCommitAt('app/src');
+  // 画面に出る内容は app/src だけで決まらない。駅マスタの「データ取得日時」は
+  // About 画面にそのまま出るので、data/ の更新でもスクリーンショットは古くなる。
+  const code = Math.max(lastCommitAt('app/src'), lastCommitAt('data'));
   const shots = lastCommitAt('assets/screenshots');
 
   if (code === 0 || shots === 0) return;

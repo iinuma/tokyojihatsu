@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-22T22:44:58.217Z",
-  "sourceDate": "2026-07-17T11:00:00+09:00",
+  "generatedAt": "2026-10-02T21:37:18.101Z",
+  "sourceDate": "2026-09-24T08:00:00+09:00",
   "challengeExpiresAt": "2027-03-12",
   "stationCount": 1844,
   "stations": [
@@ -19628,7 +19628,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "御徒町方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Akihabara.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Akihabara.InnerLoop.Weekday"
@@ -19637,7 +19637,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "神田方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Akihabara.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Akihabara.OuterLoop.Weekday"
@@ -19658,21 +19658,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ebisu.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ebisu.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "渋谷方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ebisu.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ebisu.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "目黒方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ebisu.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ebisu.InnerLoop.Weekday"
           }
         }
       ]
@@ -19690,21 +19690,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:OuterLoop",
-          "title": "外回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Gotanda.OuterLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Gotanda.OuterLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
           "label": "大崎方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Gotanda.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Gotanda.InnerLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:OuterLoop",
+          "title": "外回り",
+          "label": "目黒方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Gotanda.OuterLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Gotanda.OuterLoop.Weekday"
           }
         }
       ]
@@ -19724,7 +19724,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "新橋方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Hamamatsucho.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Hamamatsucho.InnerLoop.Weekday"
@@ -19733,7 +19733,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "田町方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Hamamatsucho.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Hamamatsucho.OuterLoop.Weekday"
@@ -19756,7 +19756,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "渋谷方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Harajuku.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Harajuku.InnerLoop.Weekday"
@@ -19765,7 +19765,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "代々木方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Harajuku.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Harajuku.OuterLoop.Weekday"
@@ -19786,21 +19786,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ikebukuro.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ikebukuro.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "大塚方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ikebukuro.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ikebukuro.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "目白方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ikebukuro.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ikebukuro.InnerLoop.Weekday"
           }
         }
       ]
@@ -19820,7 +19820,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "秋葉原方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Kanda.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Kanda.InnerLoop.Weekday"
@@ -19829,7 +19829,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "東京方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Kanda.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Kanda.OuterLoop.Weekday"
@@ -19850,21 +19850,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:OuterLoop",
-          "title": "外回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Komagome.OuterLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Komagome.OuterLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "巣鴨方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Komagome.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Komagome.InnerLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:OuterLoop",
+          "title": "外回り",
+          "label": "田端方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Komagome.OuterLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Komagome.OuterLoop.Weekday"
           }
         }
       ]
@@ -19882,21 +19882,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Meguro.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Meguro.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "恵比寿方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Meguro.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Meguro.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "五反田方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Meguro.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Meguro.InnerLoop.Weekday"
           }
         }
       ]
@@ -19916,7 +19916,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "高田馬場方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Mejiro.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Mejiro.InnerLoop.Weekday"
@@ -19925,7 +19925,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "池袋方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Mejiro.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Mejiro.OuterLoop.Weekday"
@@ -19948,7 +19948,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "西日暮里方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Nippori.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Nippori.InnerLoop.Weekday"
@@ -19957,7 +19957,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "鶯谷方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Nippori.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Nippori.OuterLoop.Weekday"
@@ -19980,7 +19980,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "田端方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.NishiNippori.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.NishiNippori.InnerLoop.Weekday"
@@ -19989,7 +19989,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "日暮里方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.NishiNippori.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.NishiNippori.OuterLoop.Weekday"
@@ -20010,21 +20010,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Okachimachi.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Okachimachi.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "秋葉原方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Okachimachi.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Okachimachi.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "上野方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Okachimachi.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Okachimachi.InnerLoop.Weekday"
           }
         }
       ]
@@ -20042,21 +20042,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Osaki.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Osaki.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "五反田方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Osaki.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Osaki.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "品川方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Osaki.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Osaki.InnerLoop.Weekday"
           }
         }
       ]
@@ -20074,21 +20074,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Otsuka.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Otsuka.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "巣鴨方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Otsuka.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Otsuka.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "池袋方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Otsuka.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Otsuka.InnerLoop.Weekday"
           }
         }
       ]
@@ -20108,7 +20108,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "恵比寿方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shibuya.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shibuya.InnerLoop.Weekday"
@@ -20117,7 +20117,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "原宿方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shibuya.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shibuya.OuterLoop.Weekday"
@@ -20138,21 +20138,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shimbashi.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shimbashi.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "浜松町方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shimbashi.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shimbashi.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "有楽町方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shimbashi.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shimbashi.InnerLoop.Weekday"
           }
         }
       ]
@@ -20172,7 +20172,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "高輪ゲートウェイ方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shinagawa.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shinagawa.InnerLoop.Weekday"
@@ -20202,21 +20202,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shinjuku.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shinjuku.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "新大久保方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shinjuku.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shinjuku.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "代々木方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Shinjuku.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Shinjuku.InnerLoop.Weekday"
           }
         }
       ]
@@ -20234,21 +20234,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.ShinOkubo.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.ShinOkubo.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "高田馬場方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.ShinOkubo.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.ShinOkubo.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "新宿方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.ShinOkubo.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.ShinOkubo.InnerLoop.Weekday"
           }
         }
       ]
@@ -20266,21 +20266,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Sugamo.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Sugamo.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "駒込方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Sugamo.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Sugamo.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "大塚方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Sugamo.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Sugamo.InnerLoop.Weekday"
           }
         }
       ]
@@ -20300,7 +20300,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "駒込方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Tabata.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Tabata.InnerLoop.Weekday"
@@ -20309,7 +20309,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "西日暮里方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Tabata.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Tabata.OuterLoop.Weekday"
@@ -20332,7 +20332,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "新大久保方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Takadanobaba.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Takadanobaba.InnerLoop.Weekday"
@@ -20341,7 +20341,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "目白方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Takadanobaba.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Takadanobaba.OuterLoop.Weekday"
@@ -20364,7 +20364,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "田町方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.TakanawaGateway.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.TakanawaGateway.InnerLoop.Weekday"
@@ -20373,7 +20373,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "品川方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.TakanawaGateway.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.TakanawaGateway.OuterLoop.Weekday"
@@ -20394,21 +20394,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Tamachi.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Tamachi.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "高輪ゲートウェイ方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Tamachi.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Tamachi.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "浜松町方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Tamachi.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Tamachi.InnerLoop.Weekday"
           }
         }
       ]
@@ -20428,7 +20428,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "神田方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Tokyo.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Tokyo.InnerLoop.Weekday"
@@ -20437,7 +20437,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "有楽町方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Tokyo.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Tokyo.OuterLoop.Weekday"
@@ -20458,21 +20458,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ueno.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ueno.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "御徒町方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ueno.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ueno.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "鶯谷方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Ueno.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Ueno.InnerLoop.Weekday"
           }
         }
       ]
@@ -20490,21 +20490,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Uguisudani.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Uguisudani.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "上野方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Uguisudani.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Uguisudani.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "日暮里方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Uguisudani.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Uguisudani.InnerLoop.Weekday"
           }
         }
       ]
@@ -20524,7 +20524,7 @@
         {
           "id": "odpt.RailDirection:InnerLoop",
           "title": "内回り",
-          "label": "大崎方面",
+          "label": "原宿方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Yoyogi.InnerLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Yoyogi.InnerLoop.Weekday"
@@ -20533,7 +20533,7 @@
         {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "新宿方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Yoyogi.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Yoyogi.OuterLoop.Weekday"
@@ -20554,21 +20554,21 @@
       "license": "challenge",
       "directions": [
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "大崎方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Yurakucho.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Yurakucho.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "大崎方面",
+          "label": "新橋方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Yurakucho.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Yurakucho.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "東京方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:JR-East.Yamanote.Yurakucho.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:JR-East.Yamanote.Yurakucho.InnerLoop.Weekday"
           }
         }
       ]
@@ -24857,8 +24857,8 @@
           "title": "下り",
           "label": "京王八王子方面",
           "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Keio.Keio.Chofu.Outbound.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:Keio.Keio.Chofu.Outbound.Weekday"
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:Keio.Keio.Chofu.Outbound.Weekday",
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Keio.Keio.Chofu.Outbound.SaturdayHoliday"
           }
         },
         {
@@ -29934,8 +29934,8 @@
           "title": "下り",
           "label": "小手指方面",
           "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Seibu.Ikebukuro.Hoya.Outbound.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:Seibu.Ikebukuro.Hoya.Outbound.Weekday"
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:Seibu.Ikebukuro.Hoya.Outbound.Weekday",
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Seibu.Ikebukuro.Hoya.Outbound.SaturdayHoliday"
           }
         },
         {
@@ -32959,8 +32959,8 @@
           "title": "下り",
           "label": "海老名方面",
           "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Sotetsu.Main.Mitsukyo.Outbound.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:Sotetsu.Main.Mitsukyo.Outbound.Weekday"
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:Sotetsu.Main.Mitsukyo.Outbound.Weekday",
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Sotetsu.Main.Mitsukyo.Outbound.SaturdayHoliday"
           }
         }
       ]
@@ -39382,8 +39382,8 @@
           "title": "下り",
           "label": "成増方面",
           "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Tobu.Tojo.KamiItabashi.Outbound.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:Tobu.Tojo.KamiItabashi.Outbound.Weekday"
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:Tobu.Tojo.KamiItabashi.Outbound.Weekday",
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Tobu.Tojo.KamiItabashi.Outbound.SaturdayHoliday"
           }
         },
         {
@@ -40278,8 +40278,8 @@
           "title": "下り",
           "label": "森林公園方面",
           "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Tobu.Tojo.Wakaba.Outbound.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:Tobu.Tojo.Wakaba.Outbound.Weekday"
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:Tobu.Tojo.Wakaba.Outbound.Weekday",
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Tobu.Tojo.Wakaba.Outbound.SaturdayHoliday"
           }
         },
         {
@@ -44521,21 +44521,21 @@
           }
         },
         {
-          "id": "odpt.RailDirection:InnerLoop",
-          "title": "内回り",
-          "label": "清澄白河方面",
-          "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Toei.Oedo.Tochomae.InnerLoop.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:Toei.Oedo.Tochomae.InnerLoop.Weekday"
-          }
-        },
-        {
           "id": "odpt.RailDirection:OuterLoop",
           "title": "外回り",
-          "label": "清澄白河方面",
+          "label": "新宿西口方面",
           "timetables": {
             "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Toei.Oedo.Tochomae.OuterLoop.SaturdayHoliday",
             "odpt.Calendar:Weekday": "odpt.StationTimetable:Toei.Oedo.Tochomae.OuterLoop.Weekday"
+          }
+        },
+        {
+          "id": "odpt.RailDirection:InnerLoop",
+          "title": "内回り",
+          "label": "新宿方面",
+          "timetables": {
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Toei.Oedo.Tochomae.InnerLoop.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:Toei.Oedo.Tochomae.InnerLoop.Weekday"
           }
         }
       ]
@@ -50434,8 +50434,8 @@
           "title": "中野方面",
           "label": "中野方面",
           "timetables": {
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:TokyoMetro.Tozai.Urayasu.TokyoMetro.Nakano.Weekday",
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:TokyoMetro.Tozai.Urayasu.TokyoMetro.Nakano.SaturdayHoliday"
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:TokyoMetro.Tozai.Urayasu.TokyoMetro.Nakano.SaturdayHoliday",
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:TokyoMetro.Tozai.Urayasu.TokyoMetro.Nakano.Weekday"
           }
         }
       ]
@@ -51486,8 +51486,8 @@
           "title": "上り",
           "label": "押上〈スカイツリー前〉方面",
           "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Tokyu.DenEnToshi.Ikejiriohashi.Inbound.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:Tokyu.DenEnToshi.Ikejiriohashi.Inbound.Weekday"
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:Tokyu.DenEnToshi.Ikejiriohashi.Inbound.Weekday",
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Tokyu.DenEnToshi.Ikejiriohashi.Inbound.SaturdayHoliday"
           }
         },
         {
@@ -51591,8 +51591,8 @@
           "title": "下り",
           "label": "中央林間方面",
           "timetables": {
-            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Tokyu.DenEnToshi.MinamiMachidaGrandberryPark.Outbound.SaturdayHoliday",
-            "odpt.Calendar:Weekday": "odpt.StationTimetable:Tokyu.DenEnToshi.MinamiMachidaGrandberryPark.Outbound.Weekday"
+            "odpt.Calendar:Weekday": "odpt.StationTimetable:Tokyu.DenEnToshi.MinamiMachidaGrandberryPark.Outbound.Weekday",
+            "odpt.Calendar:SaturdayHoliday": "odpt.StationTimetable:Tokyu.DenEnToshi.MinamiMachidaGrandberryPark.Outbound.SaturdayHoliday"
           }
         }
       ]
@@ -56848,10 +56848,6 @@
     "odpt.Station:TokyoMetro.Hibiya.NakaMeguro": "中目黒",
     "odpt.Station:TokyoMetro.Hibiya.Roppongi": "六本木",
     "odpt.Station:TokyoMetro.Hibiya.HiroO": "広尾",
-    "odpt.Station:TokyoMetro.Tozai.Nakano": "中野",
-    "odpt.Station:JR-East.ChuoSobuLocal.Mitaka": "三鷹",
-    "odpt.Station:TokyoMetro.Tozai.Kudanshita": "九段下",
-    "odpt.Station:TokyoMetro.Tozai.Toyocho": "東陽町",
     "odpt.Station:TokyoMetro.Hibiya.Ebisu": "恵比寿",
     "odpt.Station:TokyoMetro.Marunouchi.Ikebukuro": "池袋",
     "odpt.Station:TokyoMetro.Marunouchi.Myogadani": "茗荷谷",
@@ -56875,10 +56871,14 @@
     "odpt.Station:SaitamaRailway.SaitamaRailway.Hatogaya": "鳩ヶ谷",
     "odpt.Station:TokyoMetro.Namboku.OjiKamiya": "王子神谷",
     "odpt.Station:TokyoMetro.Namboku.AkabaneIwabuchi": "赤羽岩淵",
+    "odpt.Station:TokyoMetro.Tozai.Nakano": "中野",
+    "odpt.Station:JR-East.ChuoSobuLocal.Mitaka": "三鷹",
+    "odpt.Station:TokyoMetro.Tozai.Toyocho": "東陽町",
     "odpt.Station:ToyoRapid.ToyoRapid.ToyoKatsutadai": "東葉勝田台",
     "odpt.Station:TokyoMetro.Tozai.NishiFunabashi": "西船橋",
     "odpt.Station:JR-East.ChuoSobuLocal.Tsudanuma": "津田沼",
     "odpt.Station:ToyoRapid.ToyoRapid.YachiyoMidorigaoka": "八千代緑が丘",
+    "odpt.Station:TokyoMetro.Tozai.Kudanshita": "九段下",
     "odpt.Station:TokyoMetro.Tozai.Myoden": "妙典",
     "odpt.Station:TokyoMetro.Yurakucho.ShinKiba": "新木場",
     "odpt.Station:TokyoMetro.Yurakucho.Ikebukuro": "池袋",
@@ -56961,16 +56961,16 @@
     "odpt.Station:JR-East.SaikyoKawagoe.Kawagoe": "川越",
     "odpt.Station:JR-East.SaikyoKawagoe.Ikebukuro": "池袋",
     "odpt.Station:JR-East.SaikyoKawagoe.Akabane": "赤羽",
+    "odpt.Station:JR-East.KeihinTohokuNegishi.Ofuna": "大船",
+    "odpt.Station:JR-East.KeihinTohokuNegishi.Sakuragicho": "桜木町",
+    "odpt.Station:JR-East.KeihinTohokuNegishi.Isogo": "磯子",
+    "odpt.Station:JR-East.KeihinTohokuNegishi.Tsurumi": "鶴見",
+    "odpt.Station:JR-East.KeihinTohokuNegishi.HigashiKanagawa": "東神奈川",
     "odpt.Station:JR-East.KeihinTohokuNegishi.Omiya": "大宮",
     "odpt.Station:JR-East.KeihinTohokuNegishi.MinamiUrawa": "南浦和",
     "odpt.Station:JR-East.KeihinTohokuNegishi.Akabane": "赤羽",
     "odpt.Station:JR-East.KeihinTohokuNegishi.Ueno": "上野",
-    "odpt.Station:JR-East.KeihinTohokuNegishi.Ofuna": "大船",
-    "odpt.Station:JR-East.KeihinTohokuNegishi.Isogo": "磯子",
-    "odpt.Station:JR-East.KeihinTohokuNegishi.Sakuragicho": "桜木町",
-    "odpt.Station:JR-East.KeihinTohokuNegishi.Tsurumi": "鶴見",
     "odpt.Station:JR-East.KeihinTohokuNegishi.Kamata": "蒲田",
-    "odpt.Station:JR-East.KeihinTohokuNegishi.HigashiKanagawa": "東神奈川",
     "odpt.Station:JR-East.Yokohama.Hachioji": "八王子",
     "odpt.Station:JR-East.Yokohama.Hashimoto": "橋本",
     "odpt.Station:JR-East.ChuoRapid.Tokyo": "東京",
@@ -57135,8 +57135,8 @@
     "odpt.Station:JR-East.Utsunomiya.Kuroiso": "黒磯",
     "odpt.Station:JR-East.Nikko.Nikko": "日光",
     "odpt.Station:JR-East.Yamanote.Osaki": "大崎",
-    "odpt.Station:JR-East.Yamanote.Shinagawa": "品川",
     "odpt.Station:JR-East.Yamanote.Ikebukuro": "池袋",
+    "odpt.Station:JR-East.Yamanote.Shinagawa": "品川",
     "odpt.Station:JR-East.Yokohama.HigashiKanagawa": "東神奈川",
     "odpt.Station:JR-East.Yokohama.Machida": "町田",
     "odpt.Station:Keikyu.Airport.KeikyuKamata": "京急蒲田",
@@ -57176,14 +57176,14 @@
     "odpt.Station:Keio.Dobutsuen.Takahatafudo": "高幡不動",
     "odpt.Station:Keio.Keibajo.HigashiFuchu": "東府中",
     "odpt.Station:Keio.Keibajo.FuchukeibaSeimommae": "府中競馬正門前",
-    "odpt.Station:Keio.Keio.Shinjuku": "新宿",
-    "odpt.Station:Keio.Keio.Sakurajosui": "桜上水",
-    "odpt.Station:Keio.KeioNew.Shinjuku": "新宿",
-    "odpt.Station:Keio.Keio.Chofu": "調布",
     "odpt.Station:Keio.Keio.KeioHachioji": "京王八王子",
+    "odpt.Station:Keio.Keio.Takahatafudo": "高幡不動",
     "odpt.Station:Keio.Takao.Takaosanguchi": "高尾山口",
     "odpt.Station:Keio.Takao.Takao": "高尾",
-    "odpt.Station:Keio.Keio.Takahatafudo": "高幡不動",
+    "odpt.Station:Keio.KeioNew.Shinjuku": "新宿",
+    "odpt.Station:Keio.Keio.Shinjuku": "新宿",
+    "odpt.Station:Keio.Keio.Sakurajosui": "桜上水",
+    "odpt.Station:Keio.Keio.Chofu": "調布",
     "odpt.Station:Keio.Keio.Tsutsujigaoka": "つつじヶ丘",
     "odpt.Station:Keio.Sagamihara.Chofu": "調布",
     "odpt.Station:Keio.Takao.Kitano": "北野",
@@ -57205,13 +57205,13 @@
     "odpt.Station:Seibu.Shinjuku.SeibuShinjuku": "西武新宿",
     "odpt.Station:Seibu.Haijima.Haijima": "拝島",
     "odpt.Station:Seibu.Haijima.TamagawaJosui": "玉川上水",
+    "odpt.Station:Seibu.Toshima.Toshimaen": "豊島園",
+    "odpt.Station:Seibu.Sayama.SeibukyujoMae": "西武球場前",
     "odpt.Station:Seibu.Tamako.Tamako": "多摩湖",
     "odpt.Station:Seibu.Ikebukuro.Ikebukuro": "池袋",
     "odpt.Station:Seibu.SeibuYurakucho.KotakeMukaihara": "小竹向原",
-    "odpt.Station:Seibu.Sayama.SeibukyujoMae": "西武球場前",
     "odpt.Station:Chichibu.Chichibu.Mitsumineguchi": "三峰口",
     "odpt.Station:Seibu.Ikebukuro.Agano": "吾野",
-    "odpt.Station:Seibu.Toshima.Toshimaen": "豊島園",
     "odpt.Station:Seibu.Sayama.NishiTokorozawa": "西所沢",
     "odpt.Station:Seibu.Shinjuku.HonKawagoe": "本川越",
     "odpt.Station:Seibu.Shinjuku.ShinTokorozawa": "新所沢",
@@ -57229,6 +57229,7 @@
     "odpt.Station:Seibu.Tamako.Kokubunji": "国分寺",
     "odpt.Station:Seibu.Tamako.Hagiyama": "萩山",
     "odpt.Station:Seibu.Yamaguchi.Tamako": "多摩湖",
+    "odpt.Station:Tobu.TobuUrbanPark.Funabashi": "船橋",
     "odpt.Station:Tobu.Daishi.Nishiarai": "西新井",
     "odpt.Station:Tobu.Daishi.Daishimae": "大師前",
     "odpt.Station:Tobu.Isesaki.Tatebayashi": "館林",
@@ -57261,7 +57262,6 @@
     "odpt.Station:Tobu.Nikko.ShinKanuma": "新鹿沼",
     "odpt.Station:Tobu.Nikko.Tochigi": "栃木",
     "odpt.Station:Tobu.Nikko.ShimoImaichi": "下今市",
-    "odpt.Station:Tobu.TobuUrbanPark.Funabashi": "船橋",
     "odpt.Station:Tobu.TobuUrbanPark.Kashiwa": "柏",
     "odpt.Station:Tobu.TobuUrbanPark.Nodashi": "野田市",
     "odpt.Station:Tobu.TobuUrbanPark.Takayanagi": "高柳",
@@ -57271,15 +57271,15 @@
     "odpt.Station:Tobu.Sano.Tatebayashi": "館林",
     "odpt.Station:Tobu.Tojo.Ikebukuro": "池袋",
     "odpt.Station:Tobu.Tojo.KamiFukuoka": "上福岡",
-    "odpt.Station:Tobu.Tojo.Yorii": "寄居",
     "odpt.Station:Tobu.Tojo.Narimasu": "成増",
+    "odpt.Station:Tobu.Tojo.Yorii": "寄居",
     "odpt.Station:Tobu.Utsunomiya.ShinTochigi": "新栃木",
-    "odpt.Station:Sotetsu.Izumino.Futamatagawa": "二俣川",
+    "odpt.Station:Sotetsu.Main.Kashiwadai": "かしわ台",
     "odpt.Station:Sotetsu.Main.Yokohama": "横浜",
+    "odpt.Station:Sotetsu.Izumino.Futamatagawa": "二俣川",
     "odpt.Station:Tobu.Tojo.Wakoshi": "和光市",
     "odpt.Station:Sotetsu.SotetsuShinYokohama.ShinYokohama": "新横浜",
     "odpt.Station:Sotetsu.Main.Futamatagawa": "二俣川",
-    "odpt.Station:Sotetsu.Main.Kashiwadai": "かしわ台",
     "odpt.Station:Sotetsu.Main.Nishiya": "西谷",
     "odpt.TrainType:TokyoMetro.Local": "普通",
     "odpt.TrainType:TokyoMetro.Express": "急行",
@@ -57289,8 +57289,8 @@
     "odpt.TrainType:TokyoMetro.F-Liner": "Fライナー",
     "odpt.TrainType:TokyoMetro.S-TRAIN": "Sトレイン",
     "odpt.TrainType:TokyoMetro.TH-LINER": "THライナー",
-    "odpt.TrainType:TokyoMetro.CommuterRapid": "通勤快速",
     "odpt.TrainType:TokyoMetro.Rapid": "快速",
+    "odpt.TrainType:TokyoMetro.CommuterRapid": "通勤快速",
     "odpt.TrainType:TokyoMetro.RapidExpress": "快速急行",
     "odpt.TrainType:Toei.Local": "普通",
     "odpt.TrainType:Toei.AccessExpress": "アクセス特急",
@@ -57339,9 +57339,9 @@
     "odpt.TrainType:Keio.Local": "各駅停車",
     "odpt.TrainType:Keio.Express": "急行",
     "odpt.TrainType:Keio.LimitedExpress": "特急",
+    "odpt.TrainType:Keio.Rapid": "快速",
     "odpt.TrainType:Keio.KeioLiner": "京王ライナー",
     "odpt.TrainType:Keio.SemiExpress": "区間急行",
-    "odpt.TrainType:Keio.Rapid": "快速",
     "odpt.TrainType:Odakyu.Local": "各駅停車",
     "odpt.TrainType:Odakyu.Express": "急行",
     "odpt.TrainType:Odakyu.SemiExpress": "準急",
@@ -57372,8 +57372,8 @@
     "odpt.TrainType:Tobu.KawagoeLimitedExpress": "川越特急",
     "odpt.TrainType:Tobu.TJ-Liner": "TJライナー",
     "odpt.TrainType:Sotetsu.Local": "各駅停車",
-    "odpt.TrainType:Sotetsu.CommuterExpress": "通勤急行",
     "odpt.TrainType:Sotetsu.Rapid": "快速",
+    "odpt.TrainType:Sotetsu.CommuterExpress": "通勤急行",
     "odpt.TrainType:Sotetsu.LimitedExpress": "特急",
     "odpt.TrainType:Sotetsu.CommuterLimitedExpress": "通勤特急"
   }
