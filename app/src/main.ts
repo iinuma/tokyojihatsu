@@ -33,6 +33,7 @@ import type { MasterStation, StationGroup, StationMaster } from '../../src/core/
 import { PeekDetector, pitchDegrees } from '../../src/core/pitch.js';
 import { TokyoJihatsuService, type NearbyStation } from '../../src/core/service.js';
 import { isClick, isDoubleClick } from './events.js';
+import { createDeviceLease, isExitEvent } from './lifecycle.js';
 import { COUNTDOWN } from './layout.js';
 import {
   aboutText,
@@ -216,11 +217,14 @@ function createOdptClient(): OdptClient {
     });
   }
 
-  const token = import.meta.env.VITE_ODPT_TOKEN;
-  if (!token) {
-    console.warn('VITE_ODPT_PROXY も VITE_ODPT_TOKEN も未設定です');
-  }
-  return new OdptClient({ consumerKey: token ?? '' });
+  // プロキシが無ければ動かさない。
+  //
+  // 以前はここで ODPT へ直接つなぐフォールバックを持っていたが、公開ビルドでは
+  // 鍵をバンドルできない以上どのみち動かないうえ、ホスト名が .ehpk に残って
+  // 「api.odpt.org に接続するアプリ」に見える。実際 v0.4.4 はそれで
+  // リジェクトされた。接続しないホストを許可リストに書くのではなく、
+  // 経路ごと無くしてある。
+  throw new Error('VITE_ODPT_PROXY が未設定です');
 }
 
 /**
@@ -537,6 +541,14 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
     );
   }
 
+  // 終了が確定したら、掴んでいるデバイス資源を返す。
+  // FOREGROUND_EXIT は戻ってくる可能性があるので対象にしない（切ると
+  // 復帰後に見上げ表示が効かなくなる）。
+  if (isExitEvent(sys?.eventType)) {
+    await releaseDevice();
+    return;
+  }
+
   if (sys?.eventType === OsEventTypeList.IMU_DATA_REPORT && sys.imuData) {
     if (!peekEnabled || screen !== 'countdown') return;
     if (peek.update(pitchDegrees(sys.imuData.x ?? 0))) {
@@ -619,9 +631,22 @@ async function handleBack(): Promise<void> {
  *
  * mode 1 はシステムの終了確認ダイアログ。mode 0（即終了）も、自前の確認 UI も
  * ルートページでは審査に通らない。
+ *
+ * ここでは IMU を切らない。利用者がダイアログで「やめる」を選んだとき、
+ * 見上げ表示が黙って効かなくなってしまうため。解放は本当に終了が確定した
+ * SYSTEM_EXIT / ABNORMAL_EXIT で行う。
  */
 async function requestExit(): Promise<void> {
   await bridge?.shutDownPageContainer(1);
+}
+
+/**
+ * 掴んでいるデバイス資源の管理。判断とテストは lifecycle.ts にある。
+ */
+const lease = createDeviceLease((what, error) => console.warn(`${what} failed`, error));
+
+async function releaseDevice(): Promise<void> {
+  await lease.release(bridge);
 }
 
 async function handleMenu(itemID: number): Promise<void> {
@@ -743,10 +768,16 @@ async function main(): Promise<void> {
 
     try {
       await bridge.imuControl(true, ImuReportPace.P200);
+      lease.noteImuEnabled();
     } catch (error) {
       console.warn('imu failed', error);
     }
   }
+
+  // 終了イベントが来る前にページごと落とされることがあるので、こちらでも解放する。
+  globalThis.addEventListener?.('pagehide', () => {
+    void releaseDevice();
+  });
 
   // 位置情報がすぐ返っても、起動画面は読み取れるだけ出す。
   const splashLeft = splashUntil - Date.now();

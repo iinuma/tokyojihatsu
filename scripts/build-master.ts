@@ -49,7 +49,7 @@ const OUTPUT_PATH = resolve(PROJECT_ROOT, 'data/stations.json');
 /** データの取得元。エンドポイントもトークンも許諾の期限も違う。 */
 interface Source {
   license: DataLicense;
-  baseUrl?: string;
+  baseUrl: string;
   token: string;
   operators: readonly string[];
   titles: Record<string, string>;
@@ -64,6 +64,7 @@ async function loadEnv(name: string): Promise<string> {
   return matches.at(-1)?.[1]?.trim() ?? '';
 }
 
+import { ODPT_BASE_URL } from '../src/odpt/endpoints.js';
 import {
   buildRailwayOrder,
   disambiguate,
@@ -97,6 +98,7 @@ async function main(): Promise<void> {
     {
       license: 'basic',
       token: basicToken,
+      baseUrl: ODPT_BASE_URL,
       operators: TIMETABLE_OPERATORS,
       titles: OPERATOR_TITLES,
     },

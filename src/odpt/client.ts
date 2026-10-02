@@ -8,7 +8,6 @@ import type {
   OdptTrainType,
 } from './types.js';
 
-const DEFAULT_BASE = 'https://api.odpt.org/api/v4';
 
 export interface OdptClientOptions {
   consumerKey: string;
@@ -16,7 +15,8 @@ export interface OdptClientOptions {
    * ベース URL。Even Hub 公開時は API キーを秘匿するためプロキシを指す
    * （FAQ:「Move keys behind a server-side proxy.」）。
    */
-  baseUrl?: string;
+  /** 接続先。既定値は無い（公開ビルドの直叩きを防ぐため）。 */
+  baseUrl: string;
   fetchImpl?: typeof fetch;
   /**
    * すべてのリクエストに付けるヘッダ。
@@ -38,7 +38,11 @@ export class OdptClient {
 
   constructor(options: OdptClientOptions) {
     this.consumerKey = options.consumerKey;
-    this.baseUrl = (options.baseUrl ?? DEFAULT_BASE).replace(/\/$/, '');
+    // 既定値を持たせない。公開ビルドがうっかり ODPT へ直接つなぐ事故を
+    // 型と実行時の両方で防ぐ。接続先は呼ぶ側が必ず明示する。
+    const base = options.baseUrl?.trim();
+    if (!base) throw new Error('OdptClient: baseUrl は必須です');
+    this.baseUrl = base.replace(/\/$/, '');
     // fetch をそのまま代入すると this が外れる。Node では動くが、ブラウザでは
     // "Can only call Window.fetch on instances of Window" で落ちる（実機で遭遇）。
     this.fetchImpl = options.fetchImpl ?? ((input, init) => globalThis.fetch(input, init));

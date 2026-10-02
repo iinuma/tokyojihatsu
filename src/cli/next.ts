@@ -12,6 +12,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { OdptClient } from '../odpt/client.js';
+import { ODPT_BASE_URL } from '../odpt/endpoints.js';
 import { formatCountdown } from '../core/departures.js';
 import { TokyoJihatsuService } from '../core/service.js';
 import type { StationMaster } from '../core/master.js';
@@ -66,7 +67,7 @@ async function main(): Promise<void> {
   const master = JSON.parse(
     await readFile(resolve(PROJECT_ROOT, 'data/stations.json'), 'utf8'),
   ) as StationMaster;
-  const service = new TokyoJihatsuService(master, new OdptClient({ consumerKey: await loadToken() }));
+  const service = new TokyoJihatsuService(master, new OdptClient({ consumerKey: await loadToken(), baseUrl: ODPT_BASE_URL }));
 
   console.log(`現在時刻: ${jstClock(now)}   マスタ: ${master.stationCount} 駅\n`);
 

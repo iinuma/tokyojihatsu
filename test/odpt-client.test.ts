@@ -3,6 +3,9 @@ import { afterEach, describe, it } from 'node:test';
 
 import { OdptClient, OdptError } from '../src/odpt/client.js';
 
+/** 接続先は既定値を持たないので、テストでも必ず明示する。 */
+const BASE = 'https://api.odpt.org/api/v4';
+
 const originalFetch = globalThis.fetch;
 afterEach(() => {
   globalThis.fetch = originalFetch;
@@ -23,13 +26,28 @@ function spyFetch(body: unknown = [], status = 200) {
   return calls;
 }
 
+describe('接続先', () => {
+  it('baseUrl が無ければ作れない', () => {
+    // 既定値を持たせると、公開ビルドがうっかり ODPT へ直接つなぐ経路が残り、
+    // ホスト名が .ehpk に入る。v0.4.4 はそれでリジェクトされた。
+    assert.throws(
+      () => new OdptClient({ consumerKey: 'k' } as never),
+      /baseUrl/,
+    );
+  });
+
+  it('空文字も拒む', () => {
+    assert.throws(() => new OdptClient({ consumerKey: 'k', baseUrl: '  ' }), /baseUrl/);
+  });
+});
+
 describe('ODPT クライアント', () => {
   it('fetch を window の this で呼ぶ', async () => {
     // 変数に代入した fetch をそのまま呼ぶと、ブラウザで
     // "Can only call Window.fetch on instances of Window" になる。
     // Node では落ちないので、this が付いていることを明示的に確かめる。
     const calls = spyFetch();
-    await new OdptClient({ consumerKey: 'k' }).stations('odpt.Operator:Toei');
+    await new OdptClient({ consumerKey: 'k', baseUrl: BASE }).stations('odpt.Operator:Toei');
 
     assert.equal(calls.length, 1);
     assert.ok(
@@ -40,7 +58,7 @@ describe('ODPT クライアント', () => {
 
   it('事業者とキーをクエリに載せる', async () => {
     const calls = spyFetch();
-    await new OdptClient({ consumerKey: 'secret' }).stations('odpt.Operator:Toei');
+    await new OdptClient({ consumerKey: 'secret', baseUrl: BASE }).stations('odpt.Operator:Toei');
 
     const url = new URL(calls[0]!.url);
     assert.equal(url.pathname, '/api/v4/odpt:Station');
@@ -60,14 +78,14 @@ describe('ODPT クライアント', () => {
 
   it('時刻表 ID をまとめて 1 リクエストで引く', async () => {
     const calls = spyFetch();
-    await new OdptClient({ consumerKey: 'k' }).stationTimetablesById(['a', 'b']);
+    await new OdptClient({ consumerKey: 'k', baseUrl: BASE }).stationTimetablesById(['a', 'b']);
 
     assert.equal(new URL(calls[0]!.url).searchParams.get('owl:sameAs'), 'a,b');
   });
 
   it('ID が空なら通信しない', async () => {
     const calls = spyFetch();
-    const result = await new OdptClient({ consumerKey: 'k' }).stationTimetablesById([]);
+    const result = await new OdptClient({ consumerKey: 'k', baseUrl: BASE }).stationTimetablesById([]);
 
     assert.deepEqual(result, []);
     assert.equal(calls.length, 0);
@@ -76,7 +94,7 @@ describe('ODPT クライアント', () => {
   it('HTTP エラーは status 付きで投げる', async () => {
     spyFetch({ message: 'no' }, 403);
     await assert.rejects(
-      () => new OdptClient({ consumerKey: 'k' }).stations('odpt.Operator:Toei'),
+      () => new OdptClient({ consumerKey: 'k', baseUrl: BASE }).stations('odpt.Operator:Toei'),
       (error: unknown) => error instanceof OdptError && error.status === 403,
     );
   });
@@ -103,7 +121,7 @@ describe('クエリのエンコード', () => {
     // Lambda Function URL は生のコロンを含むクエリ名を
     // InvalidQueryStringException で弾く（実測）。ODPT 側はどちらでも同じ結果。
     const calls = spyFetch();
-    await new OdptClient({ consumerKey: 'k' }).stations('odpt.Operator:Toei');
+    await new OdptClient({ consumerKey: 'k', baseUrl: BASE }).stations('odpt.Operator:Toei');
 
     assert.ok(calls[0]!.url.includes('odpt%3Aoperator='), calls[0]!.url);
     assert.ok(calls[0]!.url.includes('acl%3AconsumerKey='), calls[0]!.url);
@@ -112,13 +130,13 @@ describe('クエリのエンコード', () => {
 
   it('パスのデータ型はエンコードしない（Function URL も ODPT も通る）', async () => {
     const calls = spyFetch();
-    await new OdptClient({ consumerKey: 'k' }).stations('odpt.Operator:Toei');
+    await new OdptClient({ consumerKey: 'k', baseUrl: BASE }).stations('odpt.Operator:Toei');
     assert.ok(calls[0]!.url.includes('/odpt:Station?'), calls[0]!.url);
   });
 
   it('エンコードしても値は正しく読み取れる', async () => {
     const calls = spyFetch();
-    await new OdptClient({ consumerKey: 'k' }).stations('odpt.Operator:Toei');
+    await new OdptClient({ consumerKey: 'k', baseUrl: BASE }).stations('odpt.Operator:Toei');
 
     const url = new URL(calls[0]!.url);
     assert.equal(url.searchParams.get('odpt:operator'), 'odpt.Operator:Toei');
