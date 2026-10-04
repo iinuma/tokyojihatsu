@@ -34,6 +34,12 @@ import { PeekDetector, pitchDegrees } from '../../src/core/pitch.js';
 import { TokyoJihatsuService, type NearbyStation } from '../../src/core/service.js';
 import { isClick, isDoubleClick } from './events.js';
 import { createDeviceLease, isExitEvent } from './lifecycle.js';
+import {
+  mountPhoneUi,
+  setFooter,
+  updateGlassesMirror,
+  updatePhoneUi,
+} from './phone.js';
 import { COUNTDOWN } from './layout.js';
 import {
   aboutText,
@@ -56,6 +62,8 @@ const master = masterData as unknown as StationMaster;
 
 /** ODPT ガイドライン 3.1 で表示が要る連絡先。公開前に専用アドレスへ差し替える。 */
 const CONTACT_EMAIL = 'async.sync+tokyojihatsu@gmail.com';
+/** app.json の version。vite が define で埋める。 */
+const APP_VERSION = __APP_VERSION__;
 
 /** 徒歩圏に対応駅が無かったときに広げる範囲。 */
 const WIDE_SEARCH_METERS = 30_000;
@@ -136,6 +144,8 @@ const peek = new PeekDetector();
  * 起動画面でも有効であることを知らせて、消えたときに驚かせないようにする。
  */
 let peekEnabled = true;
+/** ホスト（グラス側）に繋がっているか。端末側の画面に出す。 */
+let hostLinked = false;
 
 async function connectBridge(): Promise<{ bridge: EvenAppBridge | null; hostConnected: boolean }> {
   const candidate = await Promise.race([
@@ -375,13 +385,41 @@ async function updateRemaining(): Promise<void> {
 
 /** ブラウザでも同じ内容を読めるようにしておく（実機なしで確認するため）。 */
 function syncDom(page: PageContainers): void {
-  const element = document.getElementById('screen');
-  if (!element) return;
   const lines = [
     ...(page.textObject ?? []).map((t) => t.content ?? ''),
     ...(page.listObject ?? []).flatMap((l) => l.itemContainer?.itemName ?? []),
   ];
-  element.textContent = lines.join('\n');
+  updateGlassesMirror(lines.join('\n'));
+
+  updatePhoneUi({
+    connected: hostLinked,
+    selectionLabel: selection
+      ? `${selection.station.name}　${selection.direction.label}`
+      : null,
+    departureLine: departures
+      .slice(0, 2)
+      .map((d, i) => `${i === 0 ? '次発' : '次々発'} ${d.displayTime}`)
+      .join('　'),
+    statusLine: phoneStatusLine(),
+    peekEnabled,
+    sourceDate: master.sourceDate,
+    contactEmail: CONTACT_EMAIL,
+  });
+}
+
+/** 駅が決まっていないときに、端末側へ出す 1 行。 */
+function phoneStatusLine(): string {
+  if (lastError) return lastError;
+  switch (screen) {
+    case 'stations':
+      return '近くの駅を選んでください / Pick a nearby station';
+    case 'directions':
+      return '方面を選んでください / Pick a direction';
+    case 'about':
+      return 'データについて / About the data';
+    default:
+      return '準備中… / Starting…';
+  }
 }
 
 async function showNotice(body: string): Promise<void> {
@@ -568,12 +606,26 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
   // ドキュメントは「textEvent / listEvent に届き、例外はコンテキストメニューと
   // 長押しだけ」と書いているが、実測では sysEvent に来る（simulator 0.9.5）。
   // textEvent / listEvent も見ておくのは、経路が変わっても取りこぼさないため。
+  //
+  // **どの画面でも必ず終了確認を出す。**
+  // 以前は内部の画面（データについて・方面選択）では前へ戻していた。
+  // ドキュメントの「normally back, dismiss, or the exit dialog on a root page」に
+  // 沿わせたつもりだったが、実機では**戻る処理をした画面でアプリが確認なしに
+  // 終了した**（審査の指摘。シミュレータでは再現せず、戻っていた）。
+  //
+  // shutDownPageContainer を呼ばない経路は OS 側に落とされていると見られる。
+  // 画面ごとに分岐させると、どの画面で落ちるかを実機で全部試すまで分からない。
+  // 常に終了確認を出せば、少なくとも黙って消えることはない。
+  //
+  // 戻る手段は別に用意してある。
+  //   データについて … 1 回タップ（画面にも「タップで戻る」と出している）
+  //   方面選択       … 長押しメニューの「駅を選び直す」
   if (
     isDoubleClick(event.sysEvent?.eventType) ||
     isDoubleClick(event.textEvent?.eventType) ||
     isDoubleClick(event.listEvent?.eventType)
   ) {
-    await handleBack();
+    await requestExit();
     return;
   }
 
@@ -599,30 +651,6 @@ async function handleEvent(event: EvenHubEvent): Promise<void> {
       lastError = '';
       await showStations();
     }
-  }
-}
-
-/**
- * ダブルタップの行き先。
- *
- * ドキュメントいわく「normally back, dismiss, or the exit dialog on a root page」。
- * 内部の画面では前へ戻り、ルートでは終了確認を出す。
- *
- * ルートに当たるのは、起動して最初に出る画面——駅がまだ決まっていなければ
- * 駅選択、前回の選択を復元したならカウントダウン。審査はそこを見る。
- */
-async function handleBack(): Promise<void> {
-  switch (screen) {
-    case 'directions':
-      // 方面を選んでいる途中なら駅選択へ戻す。ここで終了すると操作をやり直せない。
-      await showStations();
-      return;
-    case 'about':
-      screen = selection ? 'countdown' : 'stations';
-      await renderPage();
-      return;
-    default:
-      await requestExit();
   }
 }
 
@@ -716,8 +744,21 @@ async function main(): Promise<void> {
   const splashUntil = Date.now() + SPLASH_MIN_MS;
   service = new TokyoJihatsuService(master, createOdptClient(), createChallengeClient());
 
+  // 端末側の画面を先に動かす。グラスに繋がる前でも、何のアプリで何ができるかは
+  // 読めるようにしておく（審査の指摘）。
+  mountPhoneUi({
+    togglePeek: async () => {
+      peekEnabled = !peekEnabled;
+      lastRemainingText = '';
+      await renderPage();
+    },
+    reselectStation: () => showStations(),
+  });
+  setFooter(`東京次発 v${APP_VERSION}　出典: 公共交通オープンデータセンター`);
+
   const connection = await connectBridge();
   bridge = connection.hostConnected ? connection.bridge : null;
+  hostLinked = connection.hostConnected;
   if (bridge) {
     hostStorage = {
       get: (key) => bridge!.getLocalStorage(key),

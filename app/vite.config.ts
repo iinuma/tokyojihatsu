@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7,7 +8,15 @@ const projectRoot = resolve(here, '..');
 
 const lanIp = process.env.LAN_IP;
 
+const appVersion = JSON.parse(
+  readFileSync(new URL('./app.json', import.meta.url), 'utf8'),
+).version as string;
+
 export default defineConfig({
+  define: {
+    // 端末側の画面に版を出す。app.json を単一の出所にしておく。
+    __APP_VERSION__: JSON.stringify(appVersion),
+  },
   root: here,
   // ODPT のトークンはプロジェクト直下の .env から読む（VITE_ODPT_TOKEN）。
   envDir: projectRoot,
