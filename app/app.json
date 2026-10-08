@@ -2,7 +2,7 @@
   "package_id": "com.masahiroiinuma.tokyojihatsu",
   "edition": "202601",
   "name": "東京次発",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "min_sdk_version": "0.0.15",
   "entrypoint": "index.html",
   "permissions": [
@@ -12,9 +12,10 @@
     },
     {
       "name": "network",
-      "desc": "駅の時刻表と、列車の遅延情報を取得するために、公共交通オープンデータセンター（ODPT）の中継サーバーへ接続します。",
+      "desc": "駅の時刻表と、列車の遅延情報を取得するために、公共交通オープンデータセンター（ODPT）の中継サーバーへ接続します。プライバシーポリシーのリンクを開いたときに限り、ポリシーを掲載しているGitHub Pages へ接続します。",
       "whitelist": [
-        "https://7i3fsrat6n32v4fadbful24jsm0yrbyu.lambda-url.ap-northeast-1.on.aws"
+        "https://7i3fsrat6n32v4fadbful24jsm0yrbyu.lambda-url.ap-northeast-1.on.aws",
+        "https://iinuma.github.io"
       ]
     }
   ],

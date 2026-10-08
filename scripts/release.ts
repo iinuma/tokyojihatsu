@@ -17,7 +17,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -31,6 +31,7 @@ interface Manifest {
   name: string;
   version: string;
   supported_languages: string[];
+  permissions?: { name: string; whitelist?: string[] }[];
 }
 
 function fail(message: string, hint?: string): never {
@@ -150,6 +151,55 @@ function checkScreenshots(): void {
   );
 }
 
+/**
+ * バンドルに出てくる URL が、全部 `network.whitelist` に載っているか。
+ *
+ * 審査で 2 度落ちた。1 度目は `OdptClient` の既定値として残っていた
+ * `api.odpt.org`、2 度目は端末側画面に足したプライバシーポリシーのリンク。
+ *
+ * **実際に接続するかどうかは関係ない。** 審査は `.ehpk` の中身を見るので、
+ * 文字列が残っていれば指摘される。ビルドしてからでないと分からないので、
+ * pack のあとに見る。
+ */
+function checkBundledUrls(manifest: Manifest): void {
+  const dir = resolve(ROOT, 'dist/app');
+  const files = [resolve(dir, 'index.html')];
+  try {
+    for (const name of readdirSync(resolve(dir, 'assets'))) {
+      files.push(resolve(dir, 'assets', name));
+    }
+  } catch {
+    // assets が無いビルドもありうる
+  }
+
+  const found = new Set<string>();
+  for (const file of files) {
+    let text: string;
+    try {
+      text = readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
+    for (const match of text.matchAll(/https?:\/\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+/g)) {
+      found.add(match[0]);
+    }
+  }
+
+  const network = manifest.permissions?.find((p) => p.name === 'network');
+  const allowed = network?.whitelist ?? [];
+  const missing = [...found].filter((url) => !allowed.some((entry) => url.startsWith(entry)));
+
+  if (missing.length > 0) {
+    fail(
+      `バンドルに、許可リストに無い URL があります:\n    ${missing.join('\n    ')}`,
+      'app.json の network.whitelist に足すか、バンドルから文字列ごと消す。\n' +
+        '    実際に接続するかに関わらず、審査は .ehpk の中身を見る。',
+    );
+  }
+
+  console.log(`  ✓ バンドルの URL ${found.size} 件はすべて許可リスト内`);
+}
+
 function main(): void {
   const manifest: Manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
   const { version, name, supported_languages: languages } = manifest;
@@ -198,6 +248,8 @@ function main(): void {
   console.log('  ✓ タグ未使用、作業ツリーはクリーン\n');
 
   execFileSync('npm', ['run', 'app:pack'], { cwd: ROOT, stdio: 'inherit' });
+
+  checkBundledUrls(manifest);
 
   console.log(`\n${'─'.repeat(64)}`);
   console.log(`  Add build に貼るもの（v${version}）`);
